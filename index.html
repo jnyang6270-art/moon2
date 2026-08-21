@@ -517,7 +517,50 @@
       text-indent: 0.06em;
       text-align: center;
       z-index: 4;
+      cursor: pointer;
       text-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 4px 20px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.3s ease;
+    }
+    .diff-title:hover {
+      filter: drop-shadow(0 0 25px rgba(255, 210, 230, 0.9));
+      transform: translateX(-50%) scale(1.03);
+    }
+
+    #cookie-canvas {
+      cursor: pointer;
+    }
+
+    .nav-enter-btn {
+      position: absolute;
+      top: 36px;
+      right: 50px;
+      z-index: 100;
+      padding: 10px 22px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .nav-enter-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 12px 35px rgba(255, 182, 193, 0.4);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+    .nav-enter-btn:active {
+      transform: scale(0.97);
     }
 
     .split-char {
@@ -593,6 +636,9 @@
       <nav class="scene-nav" id="scene-nav">
         <!-- Brand Text: 天時。地利。人和 -->
         <div class="brand-text">天時。地利。人和</div>
+        <a href="diary.html" class="nav-enter-btn" title="進入籤詩日記系統">
+          <span>進入籤詩日記 ➔</span>
+        </a>
       </nav>
 
       <!-- 3. Stage Container (1726 x 1195) -->
@@ -873,6 +919,41 @@
           targetScroll = maxScroll > 0 ? clamp(window.scrollY / maxScroll, 0, 1) : 0;
         }
       }, { passive: true });
+
+      // --- Interactive Click to Enter Diary System ---
+      const raycaster = new THREE.Raycaster();
+      const mouseVec = new THREE.Vector2();
+
+      function navigateToDiary() {
+        document.body.style.transition = 'opacity 0.4s ease, filter 0.4s ease';
+        document.body.style.opacity = '0';
+        document.body.style.filter = 'blur(10px)';
+        setTimeout(() => {
+          window.location.href = 'diary.html';
+        }, 380);
+      }
+
+      canvas.addEventListener('click', function (e) {
+        const rect = canvas.getBoundingClientRect();
+        mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouseVec, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        if (intersects.length > 0) {
+          navigateToDiary();
+        }
+      });
+
+      window.addEventListener('mousemove', function (e) {
+        const rect = canvas.getBoundingClientRect();
+        mouseVec.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseVec.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouseVec, camera);
+        const intersects = raycaster.intersectObjects(scene.children, true);
+        canvas.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
+      });
+
+      diffTitleEl.addEventListener('click', navigateToDiary);
 
 
 
