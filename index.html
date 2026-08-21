@@ -49,7 +49,6 @@
       --desktop-scale: 1;
       --header-scale: 1;
       --brand-edge-margin: 45px;
-      --social-edge-margin: 38.6204px;
       --design-width: 1726;
       --design-height: 1195;
       --tablet-layout: 0;
@@ -157,11 +156,45 @@
       pointer-events: none;
       z-index: 2;
       animation: pulseGlow 6s ease-in-out infinite alternate;
+      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Glow flare burst effect when user clicks 你的解籤日記 */
+    .ambient-glow.glow-burst {
+      width: 1200px;
+      height: 1200px;
+      background: radial-gradient(circle, rgba(255, 220, 245, 0.75) 0%, rgba(180, 160, 255, 0.45) 40%, rgba(74, 129, 146, 0) 75%);
+      opacity: 1 !important;
+      filter: drop-shadow(0 0 80px rgba(255, 182, 230, 0.9));
     }
 
     @keyframes pulseGlow {
       0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
       100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
+    }
+
+    /* Meteor Video Container */
+    #meteorVideoOverlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 8;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: screen;
+      transition: opacity 0.3s ease;
+      object-fit: cover;
+    }
+
+    /* Canvas meteor streak overlay */
+    #meteorCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 9;
+      pointer-events: none;
     }
 
     /* Stage Canvas System (1726 x 1195) */
@@ -175,12 +208,16 @@
       transform-origin: center center;
       z-index: 3;
       opacity: 0;
-      transition: opacity 300ms ease-out;
+      transition: opacity 300ms ease-out, filter 0.6s ease;
       pointer-events: none;
     }
 
     .stage.is-ready {
       opacity: 1;
+    }
+
+    .stage.moon-glow-active {
+      filter: drop-shadow(0 0 50px rgba(255, 200, 235, 0.95)) drop-shadow(0 0 90px rgba(180, 220, 255, 0.8));
     }
 
     #cookie-canvas {
@@ -189,8 +226,7 @@
       width: 100%;
       height: 100%;
       z-index: 3;
-      pointer-events: auto;
-      cursor: pointer;
+      pointer-events: none;
     }
 
     /* Header Nav */
@@ -223,38 +259,6 @@
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
       transform-origin: left top;
       transform: scale(var(--header-scale));
-    }
-
-    .nav-enter-btn {
-      position: absolute;
-      top: 30px;
-      right: 48px;
-      z-index: 100;
-      padding: 11px 24px;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.16);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      color: #ffffff;
-      font-family: 'Noto Serif TC', serif;
-      font-weight: 700;
-      font-size: 14px;
-      letter-spacing: 0.1em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-      cursor: pointer;
-      pointer-events: auto;
-      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-    }
-
-    .nav-enter-btn:hover {
-      background: rgba(255, 255, 255, 0.32);
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 12px 35px rgba(255, 182, 193, 0.5);
-      border-color: rgba(255, 255, 255, 0.7);
     }
 
     /* Titles */
@@ -298,16 +302,23 @@
       letter-spacing: 0.06em;
       text-indent: 0.06em;
       text-align: center;
-      z-index: 4;
+      z-index: 5;
       pointer-events: auto;
       cursor: pointer;
       text-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 4px 20px rgba(0, 0, 0, 0.7);
-      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.3s ease;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease, color 0.4s ease;
     }
 
     .diff-title:hover {
-      filter: drop-shadow(0 0 25px rgba(255, 210, 230, 0.9));
-      transform: translateX(-50%) scale(1.03);
+      filter: drop-shadow(0 0 35px rgba(255, 210, 230, 0.95)) drop-shadow(0 0 60px rgba(180, 220, 255, 0.7));
+      transform: translateX(-50%) scale(1.04);
+      color: #fff9fc;
+    }
+
+    .diff-title.title-glow-active {
+      color: #ffffff;
+      filter: drop-shadow(0 0 45px rgba(255, 230, 245, 1)) drop-shadow(0 0 90px rgba(160, 200, 255, 1)) !important;
+      transform: translateX(-50%) scale(1.07) !important;
     }
 
     .split-char {
@@ -650,15 +661,20 @@
       <div class="scene">
         <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
         <div class="scene-vignette"></div>
-        <div class="ambient-glow"></div>
+        <div class="ambient-glow" id="ambientGlow"></div>
+        
+        <!-- Video meteor stream from reference -->
+        <video id="meteorVideoOverlay" playsinline muted preload="auto">
+          <source src="https://www.image2url.com/r2/default/videos/1787220187246-c607a138-af17-4611-8152-a54bbe7dad0d.mp4" type="video/mp4">
+        </video>
+
+        <!-- Canvas for dynamic shooting star particles -->
+        <canvas id="meteorCanvas"></canvas>
       </div>
 
-      <!-- 2. Header UI -->
+      <!-- 2. Header UI (Clean - no right button) -->
       <nav class="scene-nav" id="scene-nav">
         <div class="brand-text">天時。地利。人和</div>
-        <button onclick="openDiarySystem()" class="nav-enter-btn" title="開啟籤詩日記系統">
-          <span>進入籤詩日記 ➔</span>
-        </button>
       </nav>
 
       <!-- 3. Stage Container (1726 x 1195) -->
@@ -669,8 +685,8 @@
         <!-- Hero Title -->
         <h1 class="title-container hero-title" id="hero-title">三分</h1>
 
-        <!-- Section 2 Title -->
-        <h2 class="title-container diff-title" id="diff-title" title="點擊開啟籤詩日記">你的解籤日記</h2>
+        <!-- Section 2 Title: Exclusive Gateway -->
+        <h2 class="title-container diff-title" id="diff-title" onclick="triggerMeteorAndEnterDiary(event)" title="點擊進入籤詩日記系統">你的解籤日記</h2>
       </div>
     </div>
   </main>
@@ -692,7 +708,181 @@
       setTimeout(() => bubble.remove(), 600);
     };
 
+    // Meteor Canvas Animation Engine
+    const meteorCanvas = document.getElementById('meteorCanvas');
+    const mCtx = meteorCanvas.getContext('2d');
+    let mWidth = window.innerWidth;
+    let mHeight = window.innerHeight;
+    meteorCanvas.width = mWidth;
+    meteorCanvas.height = mHeight;
+
+    window.addEventListener('resize', () => {
+      mWidth = window.innerWidth;
+      mHeight = window.innerHeight;
+      meteorCanvas.width = mWidth;
+      meteorCanvas.height = mHeight;
+    });
+
+    let activeMeteors = [];
+    let isMeteorAnimating = false;
+
+    class Meteor {
+      constructor(startX, startY, speed, angle, length, thickness, color) {
+        this.x = startX;
+        this.y = startY;
+        this.speed = speed;
+        this.angle = angle;
+        this.length = length;
+        this.thickness = thickness;
+        this.color = color || '#ffffff';
+        this.opacity = 1;
+        this.decay = 0.018;
+      }
+      update() {
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed;
+        this.opacity -= this.decay;
+      }
+      draw(ctx) {
+        if (this.opacity <= 0) return;
+        ctx.save();
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.thickness;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = Math.max(0, this.opacity);
+        ctx.shadowBlur = 18;
+        ctx.shadowColor = '#ffd1dc';
+
+        const tailX = this.x - Math.cos(this.angle) * this.length;
+        const tailY = this.y - Math.sin(this.angle) * this.length;
+
+        const grad = ctx.createLinearGradient(tailX, tailY, this.x, this.y);
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        grad.addColorStop(0.6, 'rgba(255, 210, 240, 0.7)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 1)');
+
+        ctx.strokeStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(tailX, tailY);
+        ctx.lineTo(this.x, this.y);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function launchMeteorShower() {
+      // Spawn meteors curving and flashing across the moon from top-right to bottom-left
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          const startX = mWidth * 0.7 + (Math.random() - 0.5) * 200;
+          const startY = mHeight * 0.15 + (Math.random() - 0.5) * 150;
+          const angle = Math.PI * 0.78 + (Math.random() - 0.5) * 0.15;
+          const speed = 28 + Math.random() * 16;
+          const length = 240 + Math.random() * 180;
+          const thickness = 2.5 + Math.random() * 2.5;
+          activeMeteors.push(new Meteor(startX, startY, speed, angle, length, thickness, '#ffd1dc'));
+        }, i * 90);
+      }
+
+      if (!isMeteorAnimating) {
+        isMeteorAnimating = true;
+        animateMeteors();
+      }
+    }
+
+    function animateMeteors() {
+      mCtx.clearRect(0, 0, mWidth, mHeight);
+      activeMeteors = activeMeteors.filter(m => m.opacity > 0);
+      for (let m of activeMeteors) {
+        m.update();
+        m.draw(mCtx);
+      }
+      if (activeMeteors.length > 0) {
+        requestAnimationFrame(animateMeteors);
+      } else {
+        isMeteorAnimating = false;
+        mCtx.clearRect(0, 0, mWidth, mHeight);
+      }
+    }
+
+    // --- Interactive Gateway: Click 你的解籤日記 -> Glow Moon & Text -> Meteor Flash -> Open Login ---
+    window.triggerMeteorAndEnterDiary = function(e) {
+      if (e) e.stopPropagation();
+
+      const diffTitle = document.getElementById('diff-title');
+      const stage = document.getElementById('stage');
+      const ambientGlow = document.getElementById('ambientGlow');
+      const meteorVideo = document.getElementById('meteorVideoOverlay');
+
+      // 1. Text & Moon Glow Flare
+      diffTitle.classList.add('title-glow-active');
+      stage.classList.add('moon-glow-active');
+      ambientGlow.classList.add('glow-burst');
+
+      // 2. Play Audio chime feedback
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          const ctx = new AudioContext();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1318.51, ctx.currentTime + 0.35);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) {}
+
+      // 3. Canvas Meteor Flash
+      launchMeteorShower();
+
+      // 4. Try video overlay playback if available
+      if (meteorVideo) {
+        meteorVideo.style.opacity = '0.9';
+        meteorVideo.currentTime = 0;
+        meteorVideo.play().catch(() => {});
+      }
+
+      // 5. Confetti sparkle burst around text
+      if (window.confetti) {
+        confetti({
+          particleCount: 45,
+          spread: 75,
+          origin: { y: 0.85 },
+          colors: ['#ffd1dc', '#ffb7c5', '#e6e6fa', '#ffffff']
+        });
+      }
+
+      // 6. Seamlessly open login overlay after meteor flash
+      setTimeout(() => {
+        const authOverlay = document.getElementById('authOverlay');
+        authOverlay.classList.remove('hidden');
+        authOverlay.style.opacity = '0';
+        requestAnimationFrame(() => {
+          authOverlay.style.opacity = '1';
+        });
+
+        // Reset glow states smoothly
+        setTimeout(() => {
+          diffTitle.classList.remove('title-glow-active');
+          stage.classList.remove('moon-glow-active');
+          ambientGlow.classList.remove('glow-burst');
+          if (meteorVideo) {
+            meteorVideo.style.opacity = '0';
+            meteorVideo.pause();
+          }
+        }, 600);
+      }, 700);
+    };
+
     window.openDiarySystem = function() {
+      const authOverlay = document.getElementById('authOverlay');
+      authOverlay.classList.add('hidden');
       const container = document.getElementById('diaryAppContainer');
       container.classList.remove('hidden');
       container.style.opacity = '1';
@@ -704,7 +894,9 @@
     };
 
     window.closeAuthOverlay = function() {
-      document.getElementById('authOverlay').classList.add('hidden');
+      const authOverlay = document.getElementById('authOverlay');
+      authOverlay.style.opacity = '0';
+      setTimeout(() => authOverlay.classList.add('hidden'), 300);
     };
 
     window.loginWithGoogle = function() {
@@ -714,6 +906,7 @@
       document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/ffb6c1/ffffff?text=G";
       showToast("歡迎回來，Google 綁定會員 💎", "success");
       if (window.confetti) confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+      openDiarySystem();
     };
 
     window.loginAnonymouslySession = function() {
@@ -722,10 +915,13 @@
       document.getElementById('userEmailDisplay').textContent = "未綁定雲端儲存";
       document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/cbd5e1/ffffff?text=客";
       showToast("已進入訪客模式 💎", "info");
+      openDiarySystem();
     };
 
     window.logoutAccount = function() {
+      document.getElementById('diaryAppContainer').classList.add('hidden');
       document.getElementById('authOverlay').classList.remove('hidden');
+      document.getElementById('authOverlay').style.opacity = '1';
       showToast("已登出", "info");
     };
 
@@ -947,9 +1143,6 @@
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
-
-    canvas.addEventListener('click', openDiarySystem);
-    diffTitleEl.addEventListener('click', openDiarySystem);
 
     let lastTime = performance.now();
     function tick(now) {
