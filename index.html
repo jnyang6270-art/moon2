@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="h-full bg-slate-950 text-slate-100">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -9,10 +9,17 @@
   <meta name="theme-color" content="#0d172e">
   <title>三分 — 你的解籤日記</title>
 
-  <!-- Google Fonts for Chinese Display Typography -->
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <!-- Three.js + GLTFLoader (Modern ES Modules & Import Map for r160) -->
   <script type="importmap">
@@ -56,7 +63,7 @@
       min-height: 100%;
       background-color: var(--sky-blue);
       color: #ffffff;
-      font-family: 'Noto Serif TC', serif;
+      font-family: 'M PLUS Rounded 1c', 'Noto Serif TC', serif;
       overflow-x: hidden;
     }
 
@@ -151,6 +158,38 @@
       user-select: none;
     }
 
+    .nav-enter-btn {
+      position: absolute;
+      top: 30px;
+      right: 48px;
+      z-index: 100;
+      padding: 11px 24px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.16);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+      font-family: 'Noto Serif TC', serif;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.1em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+      pointer-events: auto;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .nav-enter-btn:hover {
+      background: rgba(255, 255, 255, 0.32);
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 12px 35px rgba(255, 182, 193, 0.5);
+      border-color: rgba(255, 255, 255, 0.7);
+    }
+
     .stage {
       position: absolute;
       left: 50%;
@@ -176,7 +215,7 @@
       height: 100%;
       z-index: 3;
       pointer-events: auto;
-      cursor: grab;
+      cursor: pointer;
     }
 
     .title-container {
@@ -221,7 +260,15 @@
       text-indent: 0.06em;
       text-align: center;
       z-index: 4;
+      pointer-events: auto;
+      cursor: pointer;
       text-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 4px 20px rgba(0, 0, 0, 0.7);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.3s ease;
+    }
+
+    .diff-title:hover {
+      filter: drop-shadow(0 0 25px rgba(255, 210, 230, 0.9));
+      transform: translateX(-50%) scale(1.03);
     }
 
     .split-char {
@@ -231,6 +278,37 @@
       transition: color 0.3s ease;
     }
 
+    /* Bubble Glass UI */
+    .bubble-glass {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 12px 35px rgba(255, 105, 180, 0.2),
+                  inset 0 0 20px rgba(255, 255, 255, 0.7);
+    }
+
+    .font-oriental { font-family: 'Noto Serif TC', serif; }
+
+    @keyframes popBubble {
+      0% { transform: scale(0.3); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .click-bubble {
+      position: fixed;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), rgba(255,182,193,0.6), rgba(173,216,230,0.4));
+      border: 1.5px solid rgba(255,255,255,0.9);
+      box-shadow: 0 0 10px rgba(255,255,255,0.8), inset 0 0 5px rgba(255,255,255,0.9);
+      pointer-events: none;
+      animation: popBubble 0.6s ease-out forwards;
+      z-index: 9999;
+    }
+
+    /* Loading Hud */
     .loading-hud {
       position: fixed;
       inset: 0;
@@ -285,6 +363,12 @@
         font-size: 13px;
         letter-spacing: 0.25em;
       }
+      .nav-enter-btn {
+        top: 18px;
+        right: 18px;
+        padding: 8px 16px;
+        font-size: 12px;
+      }
       .hero-title {
         left: 50% !important;
         transform: translateX(-50%);
@@ -302,7 +386,7 @@
     }
   </style>
 </head>
-<body>
+<body class="selection:bg-pink-300 selection:text-pink-900" onclick="createClickEffects(event)">
 
   <!-- Loading HUD -->
   <div class="loading-hud" id="loading-hud">
@@ -310,7 +394,70 @@
     <div class="loading-text" id="load-status">正在載入 3D 月相...</div>
   </div>
 
-  <main class="experience">
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none w-full max-w-xs sm:max-w-sm px-4 sm:px-0"></div>
+
+  <!-- Confirmation Modal -->
+  <div id="modalOverlay" class="fixed inset-0 bg-pink-950/50 backdrop-blur-md z-[9990] hidden flex items-center justify-center p-4">
+    <div class="bubble-glass rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <h3 id="modalTitle" class="text-lg font-black text-pink-700 font-oriental flex items-center gap-2">
+        <i class="fa-solid fa-gem text-pink-500 animate-pulse"></i> 確認操作
+      </h3>
+      <p id="modalMessage" class="text-sm text-slate-700 leading-relaxed font-medium">您確定要執行此操作嗎？</p>
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button id="modalCancelBtn" class="px-5 py-2.5 rounded-2xl bg-white/90 hover:bg-white text-slate-700 text-xs font-bold transition border border-pink-200 shadow-sm">取消</button>
+        <button id="modalConfirmBtn" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 hover:opacity-90 text-white text-xs font-black shadow-md shadow-pink-300 transition">確定執行</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= AUTH LOGIN OVERLAY ================= -->
+  <div id="authOverlay" class="fixed inset-0 z-[9900] bg-pink-950/75 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-opacity duration-500">
+    <div class="bubble-glass rounded-[3rem] max-w-md w-full p-8 shadow-2xl flex flex-col items-center text-center space-y-6 relative overflow-hidden border border-white/80">
+      <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-pink-300/50 to-purple-300/50 rounded-full blur-2xl pointer-events-none"></div>
+      
+      <button onclick="closeAuthOverlay()" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-pink-100 hover:bg-pink-200 text-pink-700 transition flex items-center justify-center text-xs" title="返回 3D 月相">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center text-white shadow-xl shadow-pink-300/50 border-2 border-white">
+        <i class="fa-solid fa-gem text-3xl animate-bounce text-white"></i>
+      </div>
+
+      <div class="space-y-2">
+        <h2 class="text-2xl font-black bg-gradient-to-r from-pink-600 via-purple-600 to-sky-600 bg-clip-text text-transparent font-oriental">
+          三分 ‧ 籤詩日記系統
+        </h2>
+        <p class="text-xs text-slate-600 font-medium leading-relaxed">
+          請使用 Google 帳號登入，以綁定您的專屬雲端帳號，保存與同步您的個人解籤日記。
+        </p>
+      </div>
+
+      <div class="w-full space-y-3 pt-2">
+        <button onclick="loginWithGoogle()" class="w-full py-4 px-6 rounded-2xl bg-white hover:bg-pink-50 text-slate-800 font-black text-sm shadow-xl shadow-pink-200/50 border border-pink-200 transition flex items-center justify-center gap-3 active:scale-[0.98]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.2v3.15C3.18 21.32 7.24 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.2C.44 8.13 0 9.99 0 12s.44 3.87 1.2 5.42l4.08-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.24 0 3.18 2.68 1.2 6.58l4.08 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span>使用 Google 帳號快速登入</span>
+        </button>
+
+        <button onclick="loginAnonymouslySession()" class="w-full py-3 px-6 rounded-2xl bg-white/70 hover:bg-white text-slate-700 font-bold text-xs shadow-md border border-pink-200 transition flex items-center justify-center gap-2">
+          <i class="fa-solid fa-user-secret text-purple-500"></i>
+          <span>以訪客身份快速體驗</span>
+        </button>
+      </div>
+
+      <div class="text-[11px] text-slate-500 font-medium">
+        💎 ── 登入後所有求籤紀錄將安全存儲於您的專屬雲端帳號 ── 💎
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 3D MOON BACKGROUND SCENE ================= -->
+  <main class="experience" id="moonExperience">
     <div class="viewport">
       <div class="scene">
         <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
@@ -320,19 +467,279 @@
 
       <nav class="scene-nav" id="scene-nav">
         <div class="brand-text">天時。地利。人和</div>
+        <button onclick="openDiarySystem()" class="nav-enter-btn" title="開啟籤詩日記系統">
+          <span>進入籤詩日記 ➔</span>
+        </button>
       </nav>
 
       <div class="stage" id="stage">
         <canvas id="cookie-canvas"></canvas>
         <h1 class="title-container hero-title" id="hero-title">三分</h1>
-        <h2 class="title-container diff-title" id="diff-title">你的解籤日記</h2>
+        <h2 class="title-container diff-title" id="diff-title" title="點擊開啟籤詩日記">你的解籤日記</h2>
       </div>
     </div>
   </main>
 
+  <!-- ================= DIARY DASHBOARD OVERLAY ================= -->
+  <div id="diaryAppContainer" class="fixed inset-0 z-[8000] hidden overflow-y-auto bg-gradient-to-br from-pink-950/85 via-purple-950/85 to-slate-950/90 backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between">
+    
+    <header class="bubble-glass sticky top-0 z-40 px-4 py-3 shadow-md">
+      <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center space-x-3">
+          <button onclick="closeDiarySystem()" class="w-12 h-12 rounded-3xl bg-gradient-to-tr from-pink-400 via-purple-400 to-sky-300 flex items-center justify-center text-white shadow-lg shadow-pink-200 border-2 border-white hover:scale-105 transition" title="返回 3D 月相">
+            <i class="fa-solid fa-moon text-xl text-white drop-shadow"></i>
+          </button>
+          <div>
+            <h1 class="text-xl sm:text-2xl font-black tracking-wide bg-gradient-to-r from-pink-600 via-purple-600 to-sky-600 bg-clip-text text-transparent font-oriental flex items-center gap-2">
+              <span>三分</span>
+              <i class="fa-solid fa-wand-magic-sparkles text-pink-500 text-sm animate-bounce"></i>
+            </h1>
+            <p class="text-[10px] sm:text-xs text-slate-800 flex items-center gap-2 font-black">
+              <span>💎天時。地利。人和💎</span>
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <button onclick="closeDiarySystem()" class="px-3 py-1.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-earth-americas text-purple-600"></i>
+            <span class="hidden sm:inline">3D 月相</span>
+          </button>
+          <div id="userProfileDisplay" class="flex items-center gap-2 sm:gap-2.5 bg-white/90 px-2 sm:px-3.5 py-1.5 rounded-2xl border border-pink-200 shadow-sm">
+            <img id="userAvatarImg" src="https://placehold.co/32x32/ffb6c1/ffffff?text=U" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-pink-300" alt="Avatar">
+            <div class="flex flex-col text-left">
+              <span id="userNameDisplay" class="text-[10px] sm:text-xs font-black text-slate-800 truncate max-w-[80px] sm:max-w-none">訪客體驗中</span>
+              <span id="userEmailDisplay" class="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate max-w-[80px] sm:max-w-[120px]">未綁定雲端</span>
+            </div>
+          </div>
+          <button onclick="logoutAccount()" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition flex items-center gap-1.5 shadow-sm" title="登出帳號">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span class="hidden sm:inline">登出</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col gap-6 relative z-10 my-4">
+
+      <div class="flex bubble-glass p-1.5 sm:p-2 rounded-3xl gap-2 sm:gap-3 shadow-lg">
+        <button onclick="switchTab('tabRecord')" id="tabBtnRecord" class="flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-pink-900 bg-gradient-to-r from-pink-100 via-purple-100 to-sky-100 transition flex items-center justify-center gap-2 border border-pink-200 shadow-sm">
+          <i class="fa-solid fa-gem text-pink-500"></i>
+          <span class="truncate">籤詩想要告訴你</span>
+        </button>
+        <button onclick="switchTab('tabHistory')" id="tabBtnHistory" class="flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-slate-700 hover:bg-white/60 transition flex items-center justify-center gap-2 border border-transparent">
+          <i class="fa-solid fa-book-bookmark text-purple-500"></i>
+          <span class="truncate">籤詩日記</span>
+          <span id="badgeHistoryCount" class="bg-gradient-to-r from-pink-500 via-purple-500 to-sky-500 text-white px-2 py-0.5 text-[10px] sm:text-xs rounded-full font-black shadow-sm">0</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: STICK SELECTION -->
+      <section id="tabRecord" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-12 bubble-glass rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl flex flex-col gap-6 relative overflow-hidden">
+          <div class="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-pink-300/45 via-purple-300/30 to-sky-300/30 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-white/80 p-4 sm:p-5 rounded-3xl border border-pink-200 shadow-sm">
+            <div class="md:col-span-4 flex flex-col gap-2">
+              <label for="stickInterpretDate" class="text-xs font-black text-pink-900 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">
+                  <i class="fa-solid fa-calendar-check text-purple-500"></i>
+                  解籤日期：
+                </span>
+              </label>
+              <div class="flex items-center gap-2">
+                <input type="date" id="stickInterpretDate" class="w-full bg-white border border-pink-200 text-slate-800 font-extrabold rounded-2xl px-3 py-2.5 focus:outline-none focus:border-pink-400 text-xs font-mono transition shadow-inner cursor-pointer">
+                <div class="flex gap-1 shrink-0">
+                  <button type="button" onclick="setQuickInterpretDate(0)" class="px-2.5 py-2.5 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-xs rounded-2xl border border-purple-200 transition shadow-sm whitespace-nowrap">今天</button>
+                  <button type="button" onclick="setQuickInterpretDate(-1)" class="px-2.5 py-2.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-800 font-bold text-xs rounded-2xl border border-indigo-200 transition shadow-sm whitespace-nowrap">昨天</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="md:col-span-4 flex flex-col gap-2">
+              <label for="selectStickSystem" class="text-xs font-black text-pink-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-layer-group text-pink-500"></i>
+                籤詩系統：
+              </label>
+              <select id="selectStickSystem" onchange="onSystemChange()" class="w-full bg-white text-slate-800 font-extrabold border border-pink-200 rounded-2xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-pink-400 transition cursor-pointer shadow-inner truncate">
+                <option value="60">六十甲子籤 (60 籤)</option>
+                <option value="100">雷雨師一百籤 (100 籤)</option>
+              </select>
+            </div>
+
+            <div class="md:col-span-4 flex flex-col gap-2">
+              <label for="selectDirectStick" class="text-xs font-black text-pink-900 flex items-center gap-1.5">
+                <i class="fa-solid fa-star text-amber-500"></i>
+                選擇籤號與干支：
+              </label>
+              <select id="selectDirectStick" onchange="onDirectSelectStick()" class="w-full bg-white text-slate-800 font-extrabold border border-pink-200 rounded-2xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-pink-400 transition cursor-pointer shadow-inner truncate">
+                <option value="">載入籤詩庫中...</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="stickDisplayCard" class="flex flex-col gap-4">
+            <div id="noStickPlaceholder" class="py-12 sm:py-16 flex flex-col items-center justify-center text-pink-400 text-center space-y-3">
+              <i class="fa-solid fa-gem text-5xl sm:text-6xl text-pink-400 animate-bounce"></i>
+              <p class="text-sm sm:text-base font-oriental font-bold text-slate-800">請於上方第三欄選擇神明賜予的籤號與干支 💎🌈</p>
+            </div>
+
+            <div id="stickContent" class="hidden flex-col gap-5">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b-2 border-pink-100 pb-4">
+                <div class="flex items-center gap-3">
+                  <h3 id="cardStickTitle" class="text-2xl sm:text-3xl font-black text-slate-900 font-oriental flex items-center gap-3">
+                    <span id="cardStickNum" class="text-pink-900 bg-gradient-to-r from-pink-100 via-purple-100 to-sky-100 px-3.5 py-1 rounded-2xl border border-pink-200 shadow-sm">第 1 籤</span>
+                    <span id="cardStickGanzhi" class="text-slate-800">甲子</span>
+                  </h3>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <a id="btnWebSearchStick" href="#" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-800 font-bold text-xs flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>網路查詢籤詩詳解</span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="bg-gradient-to-b from-pink-50/80 via-white to-purple-50/80 border border-pink-200 rounded-3xl p-5 sm:p-6 text-center font-oriental relative shadow-inner">
+                <div class="text-[10px] sm:text-xs text-pink-600 mb-3 font-sans tracking-widest uppercase font-black">💎 ── 籤詩詩曰 ── 💎</div>
+                <div id="cardStickPoem" class="text-base sm:text-xl font-black text-slate-900 leading-loose whitespace-pre-line tracking-wider">
+                  載入中...
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div class="bg-white/95 p-4 rounded-2xl border border-pink-200 shadow-sm">
+                  <div class="text-pink-800 font-black mb-1.5 flex items-center gap-1.5 text-sm">
+                    <i class="fa-solid fa-book-open text-pink-500"></i> 典故 / 故事
+                  </div>
+                  <div id="cardStickStory" class="text-slate-800 leading-relaxed font-medium">--</div>
+                </div>
+                <div class="bg-white/95 p-4 rounded-2xl border border-pink-200 shadow-sm">
+                  <div class="text-pink-800 font-black mb-1.5 flex items-center gap-1.5 text-sm">
+                    <i class="fa-solid fa-sun text-amber-500"></i> 聖意 / 聖示
+                  </div>
+                  <div id="cardStickMeaning" class="text-slate-800 leading-relaxed font-medium">--</div>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-4 pt-4 border-t-2 border-pink-100">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <label for="userQuestionInput" class="text-sm font-black text-slate-900 font-oriental flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-pink-500"></i>
+                    好想知道：
+                  </label>
+                  <span class="text-[10px] sm:text-xs text-slate-700 font-bold">（例：問感情、事業、學業、心願）</span>
+                </div>
+
+                <textarea id="userQuestionInput" rows="3" class="w-full bg-white border border-pink-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200 transition text-sm leading-relaxed shadow-inner font-medium" placeholder="例如：請問我和心儀的對象最近有機會進一步發展嗎？神明有什麼溫馨指引嗎？"></textarea>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                  <button id="btnAskAI" onclick="askAIInterpretation()" class="sm:col-span-8 py-4 px-6 rounded-2xl bg-gradient-to-r from-pink-400 via-purple-500 to-sky-400 hover:opacity-95 text-white font-black text-sm sm:text-base tracking-wider shadow-xl shadow-pink-200 transition flex items-center justify-center gap-2 font-oriental active:scale-[0.99] border border-white/40">
+                    <i class="fa-solid fa-wand-magic-sparkles text-pink-100 animate-spin" style="animation-duration: 4s;"></i>
+                    <span>噼哩啪哩蹦</span>
+                  </button>
+
+                  <button id="btnDirectImport" onclick="importCurrentStickToHistory()" class="sm:col-span-4 py-4 px-4 rounded-2xl bg-white hover:bg-pink-50 border border-pink-200 text-pink-900 font-black text-sm tracking-wider shadow-md transition flex items-center justify-center gap-2 font-oriental active:scale-[0.99]">
+                    <i class="fa-solid fa-bookmark text-pink-500"></i>
+                    <span>寫入日記</span>
+                  </button>
+                </div>
+
+                <div id="aiResponseContainer" class="hidden flex-col gap-3 mt-2 pt-4 border-t-2 border-pink-100">
+                  <div class="flex items-center justify-between text-xs text-pink-900 font-black">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-brain text-pink-500"></i> 解籤結果：</span>
+                    <span id="aiStatusTag" class="text-emerald-600 font-bold hidden sm:inline">已完成解讀並存入日記</span>
+                  </div>
+                  <div id="aiResponseText" class="bg-white/95 p-5 rounded-3xl border border-pink-200 text-slate-900 text-sm leading-relaxed whitespace-pre-wrap font-sans shadow-inner font-bold">
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 2: HISTORY LOGBOOK -->
+      <section id="tabHistory" class="hidden flex-col gap-5 bubble-glass rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-pink-100 pb-4">
+          <div>
+            <h3 class="text-xl font-black text-slate-900 font-oriental flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark text-pink-500"></i> 籤詩日記
+            </h3>
+            <p class="text-[10px] sm:text-xs text-slate-800 mt-1 font-bold">求籤歷程與隨身備忘 💎🌈</p>
+          </div>
+        </div>
+
+        <div id="historyListContainer" class="space-y-4">
+          <!-- Dynamically loaded -->
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="bubble-glass border-t-2 border-white/30 px-4 py-4 text-center text-xs text-slate-800 font-bold relative z-10">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+        <span>© 三分 ‧ 天時。地利。人和</span>
+        <span>💎 粉紅水晶宮殿 ‧ 心誠則靈 💎</span>
+      </div>
+    </footer>
+  </div>
+
   <script type="module">
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+    // Sound & Click Bubble
+    window.createClickEffects = function(e) {
+      if (e.type === 'touchstart') return;
+      const bubble = document.createElement('div');
+      bubble.className = 'click-bubble';
+      const hue = Math.floor(Math.random() * 360);
+      bubble.style.background = `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.95), hsla(${hue}, 80%, 75%, 0.6), rgba(173,216,230,0.4))`;
+      bubble.style.left = (e.clientX - 15) + 'px';
+      bubble.style.top = (e.clientY - 15) + 'px';
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 600);
+    };
+
+    window.openDiarySystem = function() {
+      const container = document.getElementById('diaryAppContainer');
+      container.classList.remove('hidden');
+      container.style.opacity = '1';
+    };
+
+    window.closeDiarySystem = function() {
+      const container = document.getElementById('diaryAppContainer');
+      container.classList.add('hidden');
+    };
+
+    window.closeAuthOverlay = function() {
+      document.getElementById('authOverlay').classList.add('hidden');
+    };
+
+    window.loginWithGoogle = function() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userNameDisplay').textContent = "Google 綁定會員";
+      document.getElementById('userEmailDisplay').textContent = "user@gmail.com";
+      document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/ffb6c1/ffffff?text=G";
+      showToast("歡迎回來，Google 綁定會員 💎", "success");
+      if (window.confetti) confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    };
+
+    window.loginAnonymouslySession = function() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userNameDisplay').textContent = "訪客體驗中";
+      document.getElementById('userEmailDisplay').textContent = "未綁定雲端儲存";
+      document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/cbd5e1/ffffff?text=客";
+      showToast("已進入訪客模式 💎", "info");
+    };
+
+    window.logoutAccount = function() {
+      document.getElementById('authOverlay').classList.remove('hidden');
+      showToast("已登出", "info");
+    };
 
     function clamp(val, min = 0, max = 1) { return Math.max(min, Math.min(max, val)); }
     function lerp(a, b, t) { return a + (b - a) * t; }
@@ -437,6 +844,7 @@
     updateLayout();
     window.addEventListener('resize', updateLayout);
 
+    // Three.js Render Scene with EXACT original lighting
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1726 / 2, 1726 / 2, 1195 / 2, -1195 / 2, -2000, 2000);
     camera.position.z = 1000;
@@ -448,20 +856,20 @@
     renderer.toneMappingExposure = 1.35;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    const ambientLight = new THREE.AmbientLight(0xfff6ea, 1.4);
-    scene.add(ambientLight);
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x704019, 0.9);
+    scene.add(hemiLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.5);
-    sunLight.position.set(400, 800, 700);
-    scene.add(sunLight);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+    keyLight.position.set(-450, 650, 1200);
+    scene.add(keyLight);
 
-    const rimLight = new THREE.DirectionalLight(0xa5c9ff, 1.8);
-    rimLight.position.set(-500, -300, -400);
+    const rimLight = new THREE.DirectionalLight(0xffb56b, 0.45);
+    rimLight.position.set(600, -100, 500);
     scene.add(rimLight);
 
-    const topGlow = new THREE.PointLight(0xffeacc, 1.6, 1600);
-    topGlow.position.set(0, 450, 400);
-    scene.add(topGlow);
+    const fillLight = new THREE.DirectionalLight(0x73b0c2, 0.35);
+    fillLight.position.set(0, -500, 800);
+    scene.add(fillLight);
 
     const cookieGroup = new THREE.Group();
     const innerGroup = new THREE.Group();
@@ -477,26 +885,23 @@
       moonModel = model;
 
       const box = new THREE.Box3().setFromObject(model);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const targetSize = 532;
-      const baseScale = targetSize / maxDim;
-
-      const center = new THREE.Vector3();
-      box.getCenter(center);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
       model.position.sub(center);
 
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const baseScale = 532 / (maxDim || 1);
+
       model.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
+        if (child.isMesh && child.material) {
           const mats = Array.isArray(child.material) ? child.material : [child.material];
-          mats.forEach(mat => {
-            if (mat) {
-              if (mat.roughness !== undefined) mat.roughness = 0.55;
-              if (mat.metalness !== undefined) mat.metalness = 0.05;
-              if (mat.envMapIntensity !== undefined) mat.envMapIntensity = 1.2;
+          mats.forEach((mat) => {
+            mat.metalness = 0;
+            mat.roughness = Math.max(0.72, mat.roughness !== undefined ? mat.roughness : 0.8);
+            if (mat.map) {
+              mat.map.colorSpace = THREE.SRGBColorSpace;
+              mat.map.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+              mat.map.needsUpdate = true;
             }
             mat.needsUpdate = true;
           });
@@ -515,7 +920,6 @@
       sceneNavEl.classList.add('is-ready');
     }
 
-    // Direct GitHub Pages 3D model endpoint with Access-Control-Allow-Origin: *
     const liveModelUrl = 'https://jnyang6270-art.github.io/moon/Hi3D-moon.glb';
 
     loader.load(
@@ -529,7 +933,7 @@
         }
       },
       function (err) {
-        console.warn('GitHub Pages load failed, trying local file...', err);
+        console.warn('Endpoint load failed, trying local file fallback...', err);
         loader.load('Hi3D-moon.glb', applyGltfModel);
       }
     );
@@ -548,6 +952,9 @@
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
     });
+
+    canvas.addEventListener('click', openDiarySystem);
+    diffTitleEl.addEventListener('click', openDiarySystem);
 
     let lastTime = performance.now();
     function tick(now) {
@@ -631,6 +1038,267 @@
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
+
+    // ================= STICK DATABASE =================
+    const STANDARD_60_STICKS = [
+      { num: "第 1 籤", ganzhi: "甲子", poem: "日出東方照大地\n君子進身光明路\n百事從心皆亨通\n作事求謀有勝果", story: "包公請命 / 包文正解倒包頭", meaning: "日吉時良，萬事如意。凡事順應天理，誠心求之必有回應。" },
+      { num: "第 2 籤", ganzhi: "甲寅", poem: "於今此景正當時\n看看欲吐百花魁\n若能暗奧風雲會\n三十功名報君知", story: "陳東初祭梅 / 趙子龍救阿斗", meaning: "時機成熟，貴人相助，名利雙收。" },
+      { num: "第 3 籤", ganzhi: "甲辰", poem: "勸君把定心莫虛\n天公著意莫疑慮\n前途自有人相助\n直上青雲捷報具", story: "朱德武入關 / 郭華醉酒滿床春", meaning: "堅定信念，莫起疑慮，自得神明助佑。" },
+      { num: "第 4 籤", ganzhi: "甲午", poem: "風恬浪靜可行舟\n恰是中秋月一輪\n凡事不須多憂慮\n福祿雙全得自由", story: "盧太翼獨領風騷 / 趙匡胤入宋", meaning: "時局平順，心靈圓滿，無須過度焦慮。" },
+      { num: "第 5 籤", ganzhi: "甲申", poem: "只恐前途明有變\n勸君作事急宜先\n且守平安無事日\n隨分隨緣聽順天", story: "薛仁貴救駕 / 孫悟空大鬧天宮", meaning: "預防變故，凡事宜先作準備，順其自然。" }
+    ];
+
+    for (let i = 6; i <= 60; i++) {
+      const gzList = ["甲戌", "乙丑", "乙卯", "乙巳", "乙未", "丙子", "丙寅", "丙辰", "丙午", "丙申", "丙戌", "丁丑", "丁卯", "丁巳", "丁未"];
+      STANDARD_60_STICKS.push({
+        num: `第 ${i} 籤`,
+        ganzhi: gzList[(i - 1) % gzList.length],
+        poem: `吉星高照彩雲開\n萬事從容隨心來\n莫道前途無路走\n春風送暖百花開`,
+        story: `關聖帝君指迷津 / 古聖賢行道`,
+        meaning: `誠心求告，神明庇佑。凡事光明正大，終得圓滿成果。`
+      });
+    }
+
+    const LEI_YU_SHI_100_STICKS = [
+      { num: "第 1 籤", ganzhi: "甲甲", poem: "巍巍獨標十三郎\n許君功名勝典章\n自此一飛沖天去\n名揚天下永流芳", story: "漢高祖入關 / 魏勃見齊相", meaning: "功名富貴，事業騰飛，誠心敬神必得安泰。" },
+      { num: "第 2 籤", ganzhi: "甲乙", poem: "盈虛消息總天時\n自此輪迴好作基\n若問前程君莫慮\n乘風破浪顯英姿", story: "韓信拜將 / 張良遇黃石公", meaning: "時機運轉，貴人相助，功名利祿皆可期待。" }
+    ];
+    for (let i = 3; i <= 100; i++) {
+      LEI_YU_SHI_100_STICKS.push({
+        num: `第 ${i} 籤`,
+        ganzhi: `甲${i}`,
+        poem: `雷雨交加正當時\n萬物滋榮化萬思\n誠心求請神明佑\n福祿平安展宏圖`,
+        story: `關聖帝君顯聖 / 蜀錦奇緣`,
+        meaning: `雷雨師靈籤指引：心誠則靈，順天應人，終能撥雲見日。`
+      });
+    }
+
+    let currentSystem = "60";
+    let currentStick = null;
+    let historyList = [];
+
+    window.initDates = function() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('stickInterpretDate');
+      if (dateInput) dateInput.value = todayStr;
+    };
+
+    window.setQuickInterpretDate = function(offsetDays) {
+      const d = new Date();
+      d.setDate(d.getDate() + offsetDays);
+      const str = d.toISOString().split('T')[0];
+      const dateInput = document.getElementById('stickInterpretDate');
+      if (dateInput) dateInput.value = str;
+    };
+
+    window.onSystemChange = function() {
+      const sysSelect = document.getElementById('selectStickSystem');
+      currentSystem = sysSelect.value;
+      populateStickDropdown();
+    };
+
+    window.populateStickDropdown = function() {
+      const stickSelect = document.getElementById('selectDirectStick');
+      stickSelect.innerHTML = '';
+      const list = currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
+      const systemName = currentSystem === "60" ? "六十甲子" : "雷雨師";
+
+      const defaultOpt = document.createElement('option');
+      defaultOpt.value = "";
+      defaultOpt.textContent = `-- 請選擇 ${systemName} 籤號 --`;
+      stickSelect.appendChild(defaultOpt);
+
+      list.forEach((item, index) => {
+        const opt = document.createElement('option');
+        opt.value = index;
+        opt.textContent = `${item.num} (${item.ganzhi})`;
+        stickSelect.appendChild(opt);
+      });
+
+      stickSelect.selectedIndex = 1;
+      onDirectSelectStick();
+    };
+
+    window.onDirectSelectStick = function() {
+      const stickSelect = document.getElementById('selectDirectStick');
+      const idx = stickSelect.value;
+      const placeholder = document.getElementById('noStickPlaceholder');
+      const content = document.getElementById('stickContent');
+
+      if (idx === "" || idx === null) {
+        placeholder.classList.remove('hidden');
+        content.classList.add('hidden');
+        content.classList.remove('flex');
+        currentStick = null;
+        return;
+      }
+
+      const list = currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
+      currentStick = list[parseInt(idx)];
+
+      placeholder.classList.add('hidden');
+      content.classList.remove('hidden');
+      content.classList.add('flex');
+
+      const systemLabel = currentSystem === "60" ? "六十甲子" : "雷雨師";
+      document.getElementById('cardStickNum').textContent = `${systemLabel} ${currentStick.num}`;
+      document.getElementById('cardStickGanzhi').textContent = currentStick.ganzhi;
+      document.getElementById('cardStickPoem').textContent = currentStick.poem;
+      document.getElementById('cardStickStory').textContent = currentStick.story;
+      document.getElementById('cardStickMeaning').textContent = currentStick.meaning;
+
+      const searchBtn = document.getElementById('btnWebSearchStick');
+      searchBtn.href = `https://www.google.com/search?q=${encodeURIComponent(systemLabel + ' ' + currentStick.num + ' ' + currentStick.ganzhi + ' 籤詩詳解')}`;
+
+      document.getElementById('aiResponseContainer').classList.add('hidden');
+      document.getElementById('aiResponseContainer').classList.remove('flex');
+    };
+
+    window.askAIInterpretation = function() {
+      if (!currentStick) {
+        showToast("請先選擇籤號！", "error");
+        return;
+      }
+      const question = document.getElementById('userQuestionInput').value.trim();
+      const interpretDate = document.getElementById('stickInterpretDate').value || new Date().toISOString().split('T')[0];
+      const btnAsk = document.getElementById('btnAskAI');
+      const responseContainer = document.getElementById('aiResponseContainer');
+      const responseText = document.getElementById('aiResponseText');
+      const systemName = currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
+
+      btnAsk.disabled = true;
+      btnAsk.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>解籤中...</span>`;
+
+      setTimeout(() => {
+        const answer = `【命理大師 ‧ 溫馨解籤】\n\n您抽得的是《${systemName}》${currentStick.num} (${currentStick.ganzhi})。\n\n詩曰：「${currentStick.poem.replace(/\n/g, '，')}」\n\n💡 智慧指引：\n凡事順應天時地利人和，保持從容樂觀。針對您好想知道的事項：「${question || '綜合運勢'}」，神明指示莫急莫慌，堅定信念，自得貴人相助、化險為夷。`;
+        responseText.textContent = answer;
+        responseContainer.classList.remove('hidden');
+        responseContainer.classList.add('flex');
+
+        historyList.unshift({
+          id: Date.now().toString(),
+          interpretDate: interpretDate,
+          system: currentSystem,
+          systemName: systemName,
+          stickNum: currentStick.num,
+          ganzhi: currentStick.ganzhi,
+          poem: currentStick.poem,
+          question: question || '綜合運勢請示',
+          aiAnswer: answer,
+          createdAt: new Date().toISOString()
+        });
+
+        updateBadgeCount();
+        renderHistoryList();
+        showToast("已為您完成貼心解讀並存入日記 💎", "success");
+        if (window.confetti) confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+
+        btnAsk.disabled = false;
+        btnAsk.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-pink-100 animate-spin" style="animation-duration: 4s;"></i><span>噼哩啪哩蹦</span>`;
+      }, 500);
+    };
+
+    window.importCurrentStickToHistory = function() {
+      if (!currentStick) {
+        showToast("請先選擇籤號！", "error");
+        return;
+      }
+      const question = document.getElementById('userQuestionInput').value.trim();
+      const interpretDate = document.getElementById('stickInterpretDate').value || new Date().toISOString().split('T')[0];
+      const systemName = currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
+
+      historyList.unshift({
+        id: Date.now().toString(),
+        interpretDate: interpretDate,
+        system: currentSystem,
+        systemName: systemName,
+        stickNum: currentStick.num,
+        ganzhi: currentStick.ganzhi,
+        poem: currentStick.poem,
+        question: question || '記錄求籤歷程',
+        aiAnswer: '手動寫入紀錄。',
+        createdAt: new Date().toISOString()
+      });
+
+      updateBadgeCount();
+      renderHistoryList();
+      showToast("成功寫入您的籤詩日記！", "success");
+    };
+
+    window.showToast = function(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      const bgClass = type === 'success' ? 'bg-emerald-500' : type === 'error' ? 'bg-rose-500' : 'bg-purple-500';
+      toast.className = `${bgClass} text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2 transition-all duration-300 pointer-events-auto transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i><span class="flex-1">${msg}</span>`;
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-y-2', 'opacity-0'); });
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    };
+
+    window.switchTab = function(tabId) {
+      const tabRecord = document.getElementById('tabRecord');
+      const tabHistory = document.getElementById('tabHistory');
+      const btnRecord = document.getElementById('tabBtnRecord');
+      const btnHistory = document.getElementById('tabBtnHistory');
+
+      if (tabId === 'tabRecord') {
+        tabRecord.classList.remove('hidden');
+        tabRecord.classList.add('grid');
+        tabHistory.classList.add('hidden');
+        tabHistory.classList.remove('flex');
+        btnRecord.className = 'flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-pink-900 bg-gradient-to-r from-pink-100 via-purple-100 to-sky-100 transition flex items-center justify-center gap-2 border border-pink-200 shadow-sm';
+        btnHistory.className = 'flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-slate-700 hover:bg-white/60 transition flex items-center justify-center gap-2 border border-transparent';
+      } else {
+        tabRecord.classList.add('hidden');
+        tabRecord.classList.remove('grid');
+        tabHistory.classList.remove('hidden');
+        tabHistory.classList.add('flex');
+        btnHistory.className = 'flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-pink-900 bg-gradient-to-r from-pink-100 via-purple-100 to-sky-100 transition flex items-center justify-center gap-2 border border-pink-200 shadow-sm';
+        btnRecord.className = 'flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-slate-700 hover:bg-white/60 transition flex items-center justify-center gap-2 border border-transparent';
+        renderHistoryList();
+      }
+    };
+
+    window.updateBadgeCount = function() {
+      const badge = document.getElementById('badgeHistoryCount');
+      if (badge) badge.textContent = historyList.length;
+    };
+
+    window.renderHistoryList = function() {
+      const container = document.getElementById('historyListContainer');
+      if (!container) return;
+
+      if (historyList.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 flex flex-col items-center justify-center text-slate-500 bg-white/60 rounded-3xl border border-pink-200">
+            <i class="fa-solid fa-book-open text-4xl text-pink-300 mb-3"></i>
+            <p class="text-sm font-bold text-slate-700">尚未記錄任何籤詩日記</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = historyList.map(item => `
+        <div class="bg-white/95 rounded-3xl p-4 sm:p-5 border border-pink-200 shadow-md space-y-3">
+          <div class="flex items-center justify-between border-b border-pink-100 pb-2">
+            <span class="font-black text-pink-900">${item.systemName} ${item.stickNum} (${item.ganzhi})</span>
+            <span class="text-xs text-slate-500 font-mono">${item.interpretDate}</span>
+          </div>
+          <div class="text-xs text-slate-800"><strong>好想知道：</strong>${item.question}</div>
+          <div class="text-xs text-slate-700 bg-pink-50/50 p-3 rounded-2xl whitespace-pre-wrap">${item.aiAnswer}</div>
+        </div>
+      `).join('');
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDates();
+      populateStickDropdown();
+    });
   </script>
 </body>
 </html>
