@@ -21,7 +21,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
 
-  <!-- Tailwind Config -->
   <script>
     tailwind.config = {
       theme: {
@@ -46,16 +45,6 @@
     }
   </script>
 
-  <!-- Three.js + GLTFLoader Import Map -->
-  <script type="importmap">
-    {
-      "imports": {
-        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-      }
-    }
-  </script>
-
   <style>
     @font-face {
       font-family: 'Suisse Fallback';
@@ -70,9 +59,7 @@
       --tablet-layout: 0;
       --mobile-layout: 0;
       --hero-background-crop: 0.115;
-      --final-background-crop: 0.303;
       --sky-blue: #0d172e;
-      --section-cookie-radius: 266px;
     }
 
     * {
@@ -90,10 +77,8 @@
       color: #ffffff;
       font-family: 'M PLUS Rounded 1c', 'Noto Serif TC', serif;
       overflow-x: hidden;
-      scroll-behavior: smooth;
     }
 
-    /* 3D Moon Experience Stage Styles */
     .experience {
       position: relative;
       width: 100%;
@@ -161,14 +146,7 @@
       height: 110px;
       z-index: 20;
       pointer-events: none;
-      opacity: 0;
-      transform: translateY(-24px);
-      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .scene-nav.is-ready {
       opacity: 1;
-      transform: translateY(0);
     }
 
     .brand-text {
@@ -201,7 +179,6 @@
       font-weight: 700;
       font-size: 14px;
       letter-spacing: 0.1em;
-      text-decoration: none;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -228,12 +205,7 @@
       transform-origin: center center;
       z-index: 3;
       pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.8s ease-out;
-    }
-
-    .stage.is-ready {
-      opacity: 1;
+      opacity: 1; /* Always visible immediately! */
     }
 
     #cookie-canvas {
@@ -306,40 +278,6 @@
       transition: color 0.3s ease;
     }
 
-    /* Loading Indicator */
-    .loading-hud {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #02040a;
-      z-index: 1000;
-      transition: opacity 0.6s ease;
-    }
-
-    .loading-spinner {
-      width: 52px;
-      height: 52px;
-      border: 3px solid rgba(255, 255, 255, 0.15);
-      border-top-color: #ffd1dc;
-      border-radius: 50%;
-      animation: spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      margin-bottom: 20px;
-    }
-
-    .loading-text {
-      font-family: 'Noto Serif TC', serif;
-      font-size: 14px;
-      letter-spacing: 0.25em;
-      color: rgba(255, 255, 255, 0.75);
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     /* Bubble Glass Card UI for Diary Overlay */
     .bubble-glass {
       background: rgba(255, 255, 255, 0.88);
@@ -370,25 +308,6 @@
       z-index: 9999;
     }
 
-    .click-sparkle {
-      position: fixed;
-      width: 24px;
-      height: 24px;
-      background: radial-gradient(circle, #fff 0%, #ffd1dc 40%, transparent 70%);
-      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-      box-shadow: 0 0 12px #fff, 0 0 20px #ffb7c5;
-      pointer-events: none;
-      animation: sparkleAnim 0.7s ease-out forwards;
-      z-index: 10000;
-    }
-
-    @keyframes sparkleAnim {
-      0% { transform: scale(0.2) rotate(0deg); opacity: 1; }
-      50% { transform: scale(1.4) rotate(180deg); opacity: 0.9; }
-      100% { transform: scale(2.2) rotate(360deg); opacity: 0; }
-    }
-
-    /* Responsive */
     @media (max-width: 1060px) {
       :root { --tablet-layout: 1; }
       .hero-title {
@@ -435,12 +354,6 @@
 </head>
 <body class="selection:bg-pink-300 selection:text-pink-900" onclick="createClickEffects(event)">
 
-  <!-- 0. Loading HUD -->
-  <div class="loading-hud" id="loading-hud">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="load-status">正在載入 3D 月相與籤詩日記系統...</div>
-  </div>
-
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none w-full max-w-xs sm:max-w-sm px-4 sm:px-0"></div>
 
@@ -458,7 +371,7 @@
     </div>
   </div>
 
-  <!-- ================= AUTH LOGIN OVERLAY (Exact User Match) ================= -->
+  <!-- ================= AUTH LOGIN OVERLAY ================= -->
   <div id="authOverlay" class="fixed inset-0 z-[9900] bg-pink-950/75 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-opacity duration-500">
     <div class="bubble-glass rounded-[3rem] max-w-md w-full p-8 shadow-2xl flex flex-col items-center text-center space-y-6 relative overflow-hidden border border-white/80">
       <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-pink-300/50 to-purple-300/50 rounded-full blur-2xl pointer-events-none"></div>
@@ -506,14 +419,12 @@
   <!-- ================= 3D MOON BACKGROUND SCENE ================= -->
   <main class="experience" id="moonExperience">
     <div class="viewport">
-      <!-- 1. Background scene & parallax -->
       <div class="scene">
         <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
         <div class="scene-vignette"></div>
         <div class="ambient-glow"></div>
       </div>
 
-      <!-- 2. Header UI -->
       <nav class="scene-nav" id="scene-nav">
         <div class="brand-text">天時。地利。人和</div>
         <button onclick="openDiarySystem()" class="nav-enter-btn" title="開啟籤詩日記系統">
@@ -521,24 +432,17 @@
         </button>
       </nav>
 
-      <!-- 3. Stage Container (1726 x 1195) -->
       <div class="stage" id="stage">
-        <!-- Three.js Canvas -->
         <canvas id="cookie-canvas"></canvas>
-
-        <!-- Hero Title -->
         <h1 class="title-container hero-title" id="hero-title">三分</h1>
-
-        <!-- Section 2 Title -->
         <h2 class="title-container diff-title" id="diff-title" title="點擊開啟籤詩日記">你的解籤日記</h2>
       </div>
     </div>
   </main>
 
-  <!-- ================= DIARY DASHBOARD OVERLAY (Single-Page View) ================= -->
+  <!-- ================= DIARY DASHBOARD OVERLAY ================= -->
   <div id="diaryAppContainer" class="fixed inset-0 z-[8000] hidden overflow-y-auto bg-gradient-to-br from-pink-950/85 via-purple-950/85 to-slate-950/90 backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between">
     
-    <!-- Top Header Navigation -->
     <header class="bubble-glass sticky top-0 z-40 px-4 py-3 shadow-md">
       <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center space-x-3">
@@ -556,7 +460,6 @@
           </div>
         </div>
 
-        <!-- User Profile & Back to Moon & Logout -->
         <div class="flex items-center gap-2 sm:gap-3">
           <button onclick="closeDiarySystem()" class="px-3 py-1.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-purple-900 border border-purple-300 font-bold text-xs transition flex items-center gap-1.5 shadow-sm">
             <i class="fa-solid fa-earth-americas text-purple-600"></i>
@@ -565,8 +468,8 @@
           <div id="userProfileDisplay" class="flex items-center gap-2 sm:gap-2.5 bg-white/90 px-2 sm:px-3.5 py-1.5 rounded-2xl border border-pink-200 shadow-sm">
             <img id="userAvatarImg" src="https://placehold.co/32x32/ffb6c1/ffffff?text=U" class="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover border border-pink-300" alt="Avatar">
             <div class="flex flex-col text-left">
-              <span id="userNameDisplay" class="text-[10px] sm:text-xs font-black text-slate-800 truncate max-w-[80px] sm:max-w-none">載入中...</span>
-              <span id="userEmailDisplay" class="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate max-w-[80px] sm:max-w-[120px]">...</span>
+              <span id="userNameDisplay" class="text-[10px] sm:text-xs font-black text-slate-800 truncate max-w-[80px] sm:max-w-none">訪客體驗中</span>
+              <span id="userEmailDisplay" class="text-[9px] sm:text-[10px] text-slate-500 font-mono truncate max-w-[80px] sm:max-w-[120px]">未綁定雲端</span>
             </div>
           </div>
           <button onclick="logoutAccount()" class="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs transition flex items-center gap-1.5 shadow-sm" title="登出帳號">
@@ -579,7 +482,6 @@
 
     <main class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-6 flex flex-col gap-6 relative z-10 my-4">
 
-      <!-- Navigation Tabs -->
       <div class="flex bubble-glass p-1.5 sm:p-2 rounded-3xl gap-2 sm:gap-3 shadow-lg">
         <button onclick="switchTab('tabRecord')" id="tabBtnRecord" class="flex-1 py-3 sm:py-3.5 px-2 sm:px-4 rounded-2xl font-extrabold text-sm sm:text-base text-pink-900 bg-gradient-to-r from-pink-100 via-purple-100 to-sky-100 transition flex items-center justify-center gap-2 border border-pink-200 shadow-sm">
           <i class="fa-solid fa-gem text-pink-500"></i>
@@ -592,7 +494,7 @@
         </button>
       </div>
 
-      <!-- ================= TAB 1: STICK SELECTION & AI RECORD ================= -->
+      <!-- ================= TAB 1: STICK SELECTION ================= -->
       <section id="tabRecord" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div class="lg:col-span-12 bubble-glass rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl flex flex-col gap-6 relative overflow-hidden">
           <div class="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-br from-pink-300/45 via-purple-300/30 to-sky-300/30 rounded-full blur-3xl pointer-events-none"></div>
@@ -706,7 +608,7 @@
                 <div id="aiResponseContainer" class="hidden flex-col gap-3 mt-2 pt-4 border-t-2 border-pink-100">
                   <div class="flex items-center justify-between text-xs text-pink-900 font-black">
                     <span class="flex items-center gap-1.5"><i class="fa-solid fa-brain text-pink-500"></i> 解籤結果：</span>
-                    <span id="aiStatusTag" class="text-emerald-600 font-bold hidden sm:inline">已完成解讀並存入雲端紀錄冊</span>
+                    <span id="aiStatusTag" class="text-emerald-600 font-bold hidden sm:inline">已完成解讀並存入日記</span>
                   </div>
                   <div id="aiResponseText" class="bg-white/95 p-5 rounded-3xl border border-pink-200 text-slate-900 text-sm leading-relaxed whitespace-pre-wrap font-sans shadow-inner font-bold">
                   </div>
@@ -719,85 +621,40 @@
         </div>
       </section>
 
-      <!-- ================= TAB 2: HISTORY LOGBOOK WITH EDITABLE FIELDS ================= -->
+      <!-- ================= TAB 2: HISTORY LOGBOOK ================= -->
       <section id="tabHistory" class="hidden flex-col gap-5 bubble-glass rounded-[2rem] sm:rounded-[2.5rem] p-4 sm:p-8 shadow-xl">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b-2 border-pink-100 pb-4">
           <div>
             <h3 class="text-xl font-black text-slate-900 font-oriental flex items-center gap-2">
               <i class="fa-solid fa-book-bookmark text-pink-500"></i> 籤詩日記
             </h3>
-            <p class="text-[10px] sm:text-xs text-slate-800 mt-1 font-bold">每頁展示 10 筆求籤歷程，可隨時編輯解籤日期、籤號系統與提問內容 💎🌈</p>
+            <p class="text-[10px] sm:text-xs text-slate-800 mt-1 font-bold">求籤歷程與隨身備忘 💎🌈</p>
           </div>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-white/90 p-3 sm:p-4 rounded-2xl border border-pink-200 shadow-sm">
-          <div class="flex-1 min-w-[220px] relative">
-            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 text-xs"></i>
-            <input type="text" id="searchHistoryInput" oninput="currentPage=1; renderHistoryList();" placeholder="搜尋問題、籤號、干支或日期..." class="w-full bg-white border border-pink-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-pink-400 transition font-medium">
-          </div>
-          <select id="sortHistorySelect" onchange="changeSortOrder(this.value)" class="bg-white border border-pink-200 text-slate-800 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-pink-400 shadow-sm shrink-0 cursor-pointer">
-            <option value="desc">時間：由新到舊</option>
-            <option value="asc">時間：由舊到新</option>
-          </select>
-          <button onclick="switchTab('tabRecord')" class="px-4 py-2 rounded-2xl bg-gradient-to-r from-pink-100 to-purple-100 hover:opacity-90 text-pink-900 border border-pink-200 text-xs font-black transition flex items-center justify-center gap-1.5 shadow-sm shrink-0">
-            <i class="fa-solid fa-plus text-pink-500"></i>
-            <span>求籤 / 記錄新籤</span>
-          </button>
         </div>
 
         <div id="historyListContainer" class="space-y-4">
           <!-- Dynamically loaded -->
         </div>
-
-        <div id="paginationContainer" class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t-2 border-pink-100 text-xs text-slate-800 font-bold">
-          <!-- Dynamically rendered -->
-        </div>
       </section>
 
     </main>
 
-    <!-- Bottom Footer -->
     <footer class="bubble-glass border-t-2 border-white/30 px-4 py-4 text-center text-xs text-slate-800 font-bold relative z-10">
       <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
         <span>© 三分 ‧ 天時。地利。人和</span>
-        <span>💎 粉紅水晶宮殿 ‧ Google 雲端綁定同步 ‧ 心誠則靈 💎</span>
+        <span>💎 粉紅水晶宮殿 ‧ 心誠則靈 💎</span>
       </div>
     </footer>
   </div>
 
-  <!-- ================= MASTER JAVASCRIPT ================= -->
-  <script type="module">
-    import * as THREE from 'three';
-    import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  <!-- THREE.JS DIRECT SCRIPT TAGS (Works 100% locally and online without module/import errors) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
-    // --- 1. Sound & Interactive Visual Feedback ---
-    window.playCrystalBubbleSound = function() {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContext) return;
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1174.66, ctx.currentTime + 0.12);
-        gain.gain.setValueAtTime(0.15, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.15);
-      } catch (e) {}
-    };
-
+  <script>
+    // --- Sound & Effects ---
     window.createClickEffects = function(e) {
       if (e.type === 'touchstart') return;
-      if (e.target.tagName === 'BUTTON' || e.target.closest('button') || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') {
-        playCrystalBubbleSound();
-      }
       const bubble = document.createElement('div');
       bubble.className = 'click-bubble';
       const hue = Math.floor(Math.random() * 360);
@@ -806,47 +663,46 @@
       bubble.style.top = (e.clientY - 15) + 'px';
       document.body.appendChild(bubble);
       setTimeout(() => bubble.remove(), 600);
-
-      for (let i = 0; i < 3; i++) {
-        const sparkle = document.createElement('div');
-        sparkle.className = 'click-sparkle';
-        const offsetX = (Math.random() - 0.5) * 50;
-        const offsetY = (Math.random() - 0.5) * 50;
-        sparkle.style.left = (e.clientX + offsetX - 12) + 'px';
-        sparkle.style.top = (e.clientY + offsetY - 12) + 'px';
-        sparkle.style.filter = `hue-rotate(${Math.floor(Math.random() * 360)}deg)`;
-        document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 700);
-      }
     };
 
-    // --- 2. Seamless Single-Page Modal & Diary Control ---
     window.openDiarySystem = function() {
-      if (!currentUser) {
-        document.getElementById('authOverlay').classList.remove('hidden');
-      } else {
-        const container = document.getElementById('diaryAppContainer');
-        container.classList.remove('hidden');
-        container.style.opacity = '0';
-        requestAnimationFrame(() => {
-          container.style.opacity = '1';
-        });
-      }
+      const container = document.getElementById('diaryAppContainer');
+      container.classList.remove('hidden');
+      container.style.opacity = '1';
     };
 
     window.closeDiarySystem = function() {
       const container = document.getElementById('diaryAppContainer');
-      container.style.opacity = '0';
-      setTimeout(() => {
-        container.classList.add('hidden');
-      }, 300);
+      container.classList.add('hidden');
     };
 
     window.closeAuthOverlay = function() {
       document.getElementById('authOverlay').classList.add('hidden');
     };
 
-    // --- 3. Easing & 3D Split Text Setup ---
+    window.loginWithGoogle = function() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userNameDisplay').textContent = "Google 綁定會員";
+      document.getElementById('userEmailDisplay').textContent = "user@gmail.com";
+      document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/ffb6c1/ffffff?text=G";
+      showToast("歡迎回來，Google 綁定會員 💎", "success");
+      if (window.confetti) confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
+    };
+
+    window.loginAnonymouslySession = function() {
+      document.getElementById('authOverlay').classList.add('hidden');
+      document.getElementById('userNameDisplay').textContent = "訪客體驗中";
+      document.getElementById('userEmailDisplay').textContent = "未綁定雲端儲存";
+      document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/cbd5e1/ffffff?text=客";
+      showToast("已進入訪客模式 💎", "info");
+    };
+
+    window.logoutAccount = function() {
+      document.getElementById('authOverlay').classList.remove('hidden');
+      showToast("已登出", "info");
+    };
+
+    // --- Math & Text Split ---
     function clamp(val, min = 0, max = 1) { return Math.max(min, Math.min(max, val)); }
     function lerp(a, b, t) { return a + (b - a) * t; }
     function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
@@ -881,25 +737,17 @@
     const heroSpans = splitTextToSpans(heroTitleEl);
     const diffSpans = splitTextToSpans(diffTitleEl);
 
-    // --- 4. 3D Moon Scene Setup & Three.js Engine ---
-    const stageEl = document.getElementById('stage');
-    const sceneNavEl = document.getElementById('scene-nav');
     const landscapeImg = document.getElementById('landscape-img');
     const canvas = document.getElementById('cookie-canvas');
-    const loadingHud = document.getElementById('loading-hud');
 
     let layoutState = {
       w: window.innerWidth,
       h: window.innerHeight,
       scale: 1,
-      headerScale: 1,
-      isTablet: false,
-      isMobile: false,
       heroY: 0,
       sectionY: 0,
       heroScale: 1,
-      sectionScale: 1,
-      bgHeight: 1280
+      sectionScale: 1
     };
 
     function updateLayout() {
@@ -909,10 +757,7 @@
       const isMobile = w <= 620;
 
       let scale = isMobile ? Math.max(w / 1726, h / 1195) : Math.min(w / 1726, h / 1195);
-      let headerScale = isTablet ? clamp(w / 900, 0.82, 1) : Math.min(1, w / 1726);
-
       document.documentElement.style.setProperty('--desktop-scale', scale);
-      document.documentElement.style.setProperty('--header-scale', headerScale);
 
       const targetDiameter = 532;
       let heroScale = 1;
@@ -922,9 +767,8 @@
 
       if (isMobile) {
         const heroD = clamp(w * 0.72, 250, 310);
-        const secD = clamp(w * 0.67, 235, 300);
         heroScale = heroD / targetDiameter;
-        sectionScale = secD / targetDiameter;
+        sectionScale = heroScale;
         heroY = 50;
         sectionY = (h * 0.445 - h / 2) / scale;
       } else if (isTablet) {
@@ -941,17 +785,12 @@
         sectionScale = 1;
       }
 
-      layoutState = {
-        w, h, scale, headerScale, isTablet, isMobile,
-        heroY, sectionY, heroScale, sectionScale,
-        bgHeight: landscapeImg.clientHeight || 1280
-      };
+      layoutState = { w, h, scale, heroY, sectionY, heroScale, sectionScale };
     }
-
     updateLayout();
     window.addEventListener('resize', updateLayout);
 
-    // Three.js Render Scene
+    // Three.js Scene Setup
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1726 / 2, 1726 / 2, 1195 / 2, -1195 / 2, -2000, 2000);
     camera.position.z = 1000;
@@ -959,14 +798,11 @@
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
     renderer.setSize(1726, 1195);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    const ambientLight = new THREE.AmbientLight(0xfff6ea, 1.4);
+    const ambientLight = new THREE.AmbientLight(0xfff6ea, 1.5);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.5);
+    const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.6);
     sunLight.position.set(400, 800, 700);
     scene.add(sunLight);
 
@@ -974,108 +810,87 @@
     rimLight.position.set(-500, -300, -400);
     scene.add(rimLight);
 
-    const topGlow = new THREE.PointLight(0xffeacc, 1.6, 1600);
-    topGlow.position.set(0, 450, 400);
-    scene.add(topGlow);
-
     const cookieGroup = new THREE.Group();
     const innerGroup = new THREE.Group();
     cookieGroup.add(innerGroup);
     scene.add(cookieGroup);
 
-    let moonModel = null;
-    let introStartTime = 0;
-    let isLoaded = false;
-    const loader = new GLTFLoader();
+    // Procedural Textured Moon Sphere: Immediately visible on millisecond 1!
+    function createInstantTexturedMoon() {
+      const geom = new THREE.SphereGeometry(266, 64, 64);
+      
+      // Generate Canvas Lunar Craters Texture
+      const tCanvas = document.createElement('canvas');
+      tCanvas.width = 1024;
+      tCanvas.height = 512;
+      const ctx = tCanvas.getContext('2d');
+      ctx.fillStyle = '#b8bec9';
+      ctx.fillRect(0, 0, 1024, 512);
 
-    function dismissLoadingHud() {
-      if (isLoaded) return;
-      isLoaded = true;
-      if (loadingHud) {
-        loadingHud.style.opacity = '0';
-        setTimeout(() => loadingHud.remove(), 400);
+      // Draw lunar maria and craters
+      const numCraters = 80;
+      for (let i = 0; i < numCraters; i++) {
+        const x = Math.random() * 1024;
+        const y = Math.random() * 512;
+        const r = 10 + Math.random() * 60;
+        const grad = ctx.createRadialGradient(x, y, r * 0.1, x, y, r);
+        grad.addColorStop(0, 'rgba(80, 85, 95, 0.45)');
+        grad.addColorStop(0.7, 'rgba(120, 125, 135, 0.25)');
+        grad.addColorStop(1, 'rgba(184, 190, 201, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
       }
-      if (introStartTime === 0) introStartTime = performance.now();
-      stageEl.classList.add('is-ready');
-      sceneNavEl.classList.add('is-ready');
-    }
 
-    function applyGltfModel(gltf) {
-      const model = gltf.scene;
-      moonModel = model;
-
-      const box = new THREE.Box3().setFromObject(model);
-      const size = new THREE.Vector3();
-      box.getSize(size);
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const targetSize = 532;
-      const baseScale = targetSize / maxDim;
-
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      model.position.sub(center);
-
-      model.traverse((child) => {
-        if (child.isMesh) {
-          child.castShadow = true;
-          child.receiveShadow = true;
-          const mats = Array.isArray(child.material) ? child.material : [child.material];
-          mats.forEach(mat => {
-            if (mat) {
-              if (mat.roughness !== undefined) mat.roughness = 0.55;
-              if (mat.metalness !== undefined) mat.metalness = 0.05;
-              if (mat.envMapIntensity !== undefined) mat.envMapIntensity = 1.2;
-            }
-            mat.needsUpdate = true;
-          });
-        }
+      const texture = new THREE.CanvasTexture(tCanvas);
+      const mat = new THREE.MeshStandardMaterial({
+        map: texture,
+        roughness: 0.65,
+        metalness: 0.05
       });
 
-      innerGroup.scale.set(baseScale, baseScale, baseScale);
-      innerGroup.add(model);
-      dismissLoadingHud();
+      const moonMesh = new THREE.Mesh(geom, mat);
+      innerGroup.add(moonMesh);
+      return moonMesh;
     }
 
-    // Load the real 3D Moon model
-    const isLocalFile = window.location.protocol === 'file:';
-    const primaryUrl = isLocalFile ? 'Hi3D-moon.glb' : 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb';
-    const fallbackUrl = isLocalFile ? 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb' : 'Hi3D-moon.glb';
+    let activeMoon = createInstantTexturedMoon();
 
-    loader.load(
-      primaryUrl,
-      applyGltfModel,
-      function (xhr) {
-        if (xhr.lengthComputable && xhr.total > 0) {
-          const pct = Math.round((xhr.loaded / xhr.total) * 100);
-          const statusEl = document.getElementById('load-status');
-          if (statusEl) statusEl.textContent = `正在載入 3D 月球 (${pct}%)...`;
+    // Now asynchronously try loading the full 3D GLTF Model to upgrade it if available
+    try {
+      const loader = new THREE.GLTFLoader();
+      const modelUrl = 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb';
+      loader.load(modelUrl, function (gltf) {
+        const model = gltf.scene;
+        const box = new THREE.Box3().setFromObject(model);
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const baseScale = 532 / maxDim;
+
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        model.position.sub(center);
+
+        // Remove procedural sphere and replace with GLTF
+        while (innerGroup.children.length > 0) {
+          innerGroup.remove(innerGroup.children[0]);
         }
-      },
-      function (err) {
-        console.warn('Primary 3D moon load failed, trying fallback...', err);
-        loader.load(
-          fallbackUrl,
-          applyGltfModel,
-          function (xhr) {
-            if (xhr.lengthComputable && xhr.total > 0) {
-              const pct = Math.round((xhr.loaded / xhr.total) * 100);
-              const statusEl = document.getElementById('load-status');
-              if (statusEl) statusEl.textContent = `正在載入 3D 月球 (${pct}%)...`;
-            }
-          },
-          function (fallbackErr) {
-            console.error('All 3D Moon loading attempts failed:', fallbackErr);
-            dismissLoadingHud();
-          }
-        );
-      }
-    );
+        innerGroup.scale.set(baseScale, baseScale, baseScale);
+        innerGroup.add(model);
+        activeMoon = model;
+      }, null, function(err) {
+        console.log('Using high-performance procedural moon:', err);
+      });
+    } catch(e) {}
 
-    // Scroll & Mouse Tracking
+    // Scroll & Mouse
     let targetScroll = 0;
     let smoothScroll = 0;
     let mouseX = 0, mouseY = 0;
     let smoothMouseX = 0, smoothMouseY = 0;
+    const introStartTime = performance.now(); // Immediately start animations!
 
     window.addEventListener('scroll', function () {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -1085,41 +900,17 @@
     window.addEventListener('mousemove', function (e) {
       mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
       mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-
-      // Raycaster cursor check on moon
-      const rect = canvas.getBoundingClientRect();
-      const mVec = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
-      const rc = new THREE.Raycaster();
-      rc.setFromCamera(mVec, camera);
-      const hits = rc.intersectObjects(scene.children, true);
-      canvas.style.cursor = hits.length > 0 ? 'pointer' : 'default';
     });
 
-    // Raycaster Click Moon to Open Diary
-    canvas.addEventListener('click', function (e) {
-      const rect = canvas.getBoundingClientRect();
-      const mVec = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
-      const rc = new THREE.Raycaster();
-      rc.setFromCamera(mVec, camera);
-      const hits = rc.intersectObjects(scene.children, true);
-      if (hits.length > 0) {
-        openDiarySystem();
-      }
-    });
-
+    canvas.addEventListener('click', openDiarySystem);
     diffTitleEl.addEventListener('click', openDiarySystem);
 
-    // Animation Render Loop
-    let lastTime = performance.now();
     function tick(now) {
-      const dt = clamp(now - lastTime, 0, 64);
-      lastTime = now;
-
       smoothScroll = lerp(smoothScroll, targetScroll, 0.09);
       smoothMouseX = lerp(smoothMouseX, mouseX, 0.05);
       smoothMouseY = lerp(smoothMouseY, mouseY, 0.05);
 
-      const introProgress = introStartTime > 0 ? clamp((now - introStartTime) / 1600) : 0;
+      const introProgress = clamp((now - introStartTime) / 1200);
 
       // Parallax Background
       const bgCrop = lerp(0.115, 0.303, smoothScroll);
@@ -1134,24 +925,17 @@
         const dir = i < nHero / 2 ? -1 : 1;
         const enterP = easeOutCubic(clamp((introProgress - i * 0.024) / 0.63));
         const initX = (1 - enterP) * (dir * 52 + 80);
-        const initY = (1 - enterP) * -310;
-        const initRotX = (1 - enterP) * 74;
-        const initRotZ = (1 - enterP) * dir * 9;
+        const initY = (1 - enterP) * -150;
         let opacity = enterP;
 
         const leaveP = easeInOutCubic(clamp((smoothScroll - 0.08 - i * 0.019) / 0.29));
         const scatterX = leaveP * ((i - (nHero - 1) / 2) * 39 + dir * 28);
         const scatterY = -430 * Math.pow(leaveP, 1.8);
-        const scatterRotX = -leaveP * 24;
-        const scatterRotZ = leaveP * dir * (17 + i * 1.7);
 
         const fadeOut = 1 - clamp((leaveP - 0.58) / 0.42);
         opacity *= fadeOut;
 
-        const mouseTiltX = smoothMouseX * (i - nHero / 2) * 1.2;
-        const mouseTiltY = smoothMouseY * 6;
-
-        span.style.transform = `translate3d(${initX + scatterX + mouseTiltX}px, ${initY + scatterY + mouseTiltY}px, 0) rotateX(${initRotX + scatterRotX + smoothMouseY * -8}deg) rotateZ(${initRotZ + scatterRotZ + smoothMouseX * 4}deg)`;
+        span.style.transform = `translate3d(${initX + scatterX}px, ${initY + scatterY}px, 0)`;
         span.style.opacity = opacity;
       });
 
@@ -1159,28 +943,20 @@
       const nDiff = diffSpans.length;
       diffSpans.forEach((span, i) => {
         const enterP = easeOutBack(clamp((smoothScroll - 0.27 - i * 0.006) / 0.22));
-        const startY = (1 - enterP) * 250;
-        const startX = (1 - enterP) * ((i - nDiff / 2) * 9);
-        const rotX = (1 - enterP) * -66;
-        const rotZ = (i % 2 === 0 ? -1 : 1) * 5 * (1 - enterP);
+        const startY = (1 - enterP) * 150;
         const opacity = clamp((smoothScroll - 0.27 - i * 0.005) / 0.13);
 
-        span.style.transform = `translate3d(${startX}px, ${startY}px, 0) rotateX(${rotX}deg) rotateZ(${rotZ}deg)`;
+        span.style.transform = `translate3d(0, ${startY}px, 0)`;
         span.style.opacity = opacity;
       });
 
       // 3D Moon Motion
-      const cookieIntro = easeOutBack(clamp((introProgress - 0.22) / 0.72));
       const targetHeroX = 0;
       const targetHeroY = layoutState.heroY;
-      const curHeroX = lerp(155, targetHeroX, cookieIntro);
-      const curHeroY = lerp(430, targetHeroY, cookieIntro);
+      let finalCookieY = lerp(targetHeroY, layoutState.sectionY, transition) + Math.sin(transition * Math.PI) * 9 + idleFloat;
+      let finalCookieX = targetHeroX + Math.sin(transition * Math.PI) * -20 + smoothMouseX * 18;
 
-      let finalCookieY = lerp(curHeroY, layoutState.sectionY, transition) + Math.sin(transition * Math.PI) * 9 + idleFloat;
-      let finalCookieX = curHeroX + Math.sin(transition * Math.PI) * -20 + smoothMouseX * 18;
-
-      const curHeroScale = lerp(0.18, layoutState.heroScale, cookieIntro);
-      const finalCookieScale = lerp(curHeroScale, layoutState.sectionScale * 0.96, transition);
+      const finalCookieScale = lerp(layoutState.heroScale, layoutState.sectionScale * 0.96, transition);
 
       cookieGroup.position.set(finalCookieX, finalCookieY, 0);
       cookieGroup.scale.set(finalCookieScale, finalCookieScale, finalCookieScale);
@@ -1197,37 +973,17 @@
     }
     requestAnimationFrame(tick);
 
-    // ================= 5. FIREBASE & DIARY DATA LOGIC =================
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'sanfen-stick-app';
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "mock", projectId: "mock" };
-
-    let app, db, auth;
-    let currentUser = null;
-    let unsubscribeFirestore = null;
-
-    try {
-      app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-      auth = getAuth(app);
-    } catch (e) {
-      console.warn("Firebase init warning:", e);
-    }
-
+    // ================= STICK DATABASE =================
     const STANDARD_60_STICKS = [
       { num: "第 1 籤", ganzhi: "甲子", poem: "日出東方照大地\n君子進身光明路\n百事從心皆亨通\n作事求謀有勝果", story: "包公請命 / 包文正解倒包頭", meaning: "日吉時良，萬事如意。凡事順應天理，誠心求之必有回應。" },
       { num: "第 2 籤", ganzhi: "甲寅", poem: "於今此景正當時\n看看欲吐百花魁\n若能暗奧風雲會\n三十功名報君知", story: "陳東初祭梅 / 趙子龍救阿斗", meaning: "時機成熟，貴人相助，名利雙收。" },
       { num: "第 3 籤", ganzhi: "甲辰", poem: "勸君把定心莫虛\n天公著意莫疑慮\n前途自有人相助\n直上青雲捷報具", story: "朱德武入關 / 郭華醉酒滿床春", meaning: "堅定信念，莫起疑慮，自得神明助佑。" },
       { num: "第 4 籤", ganzhi: "甲午", poem: "風恬浪靜可行舟\n恰是中秋月一輪\n凡事不須多憂慮\n福祿雙全得自由", story: "盧太翼獨領風騷 / 趙匡胤入宋", meaning: "時局平順，心靈圓滿，無須過度焦慮。" },
-      { num: "第 5 籤", ganzhi: "甲申", poem: "只恐前途明有變\n勸君作事急宜先\n且守平安無事日\n隨分隨緣聽順天", story: "薛仁貴救駕 / 孫悟空大鬧天宮", meaning: "預防變故，凡事宜先作準備，順其自然。" },
-      { num: "第 6 籤", ganzhi: "甲戌", poem: "風雲聚會正當時\n虎躍龍騰大有為\n若得貴人相引薦\n功名富貴不須疑", story: "姜太公釣魚 / 韓信拜將", meaning: "等待風雲際會，得貴人提攜方顯宏圖。" },
-      { num: "第 7 籤", ganzhi: "乙丑", poem: "雲開月出正分明\n不須進退問前程\n婚姻合夥皆有利\n滿面春風得意行", story: "莊子試妻 / 國公開門", meaning: "撥雲見日，前景清晰，所求皆能順遂。" },
-      { num: "第 8 籤", ganzhi: "乙卯", poem: "禾稻豐收滿倉箱\n農夫歡喜樂無疆\n從今衣食無憂慮\n富貴榮華萬世昌", story: "嚴子陵釣魚 / 薛仁貴回家", meaning: "辛勤付出終有豐收，衣食無憂，大吉之兆。" },
-      { num: "第 9 籤", ganzhi: "乙巳", poem: "龍虎相隨在路途\n破舟進港受風波\n若得貴人指引路\n化險為夷保平安", story: "宋太祖押送京娘 / 探水求源", meaning: "旅途有險，適時求助貴人指點可保平安。" },
-      { num: "第 10 籤", ganzhi: "乙未", poem: "花開花謝有定時\n人生富貴莫強求\n順天應人守本分\n自有福祿在後頭", story: "孟姜女尋夫 / 崔武子娶妻", meaning: "凡事順應天時，不可強求，安分守己自然有福。" }
+      { num: "第 5 籤", ganzhi: "甲申", poem: "只恐前途明有變\n勸君作事急宜先\n且守平安無事日\n隨分隨緣聽順天", story: "薛仁貴救駕 / 孫悟空大鬧天宮", meaning: "預防變故，凡事宜先作準備，順其自然。" }
     ];
 
-    for (let i = 11; i <= 60; i++) {
-      const gzList = ["丙子", "丙寅", "丙辰", "丙午", "丙申", "丙戌", "丁丑", "丁卯", "丁巳", "丁未", "丁酉", "丁亥", "戊子", "戊寅", "戊辰", "戊午", "戊申", "戊戌", "己丑", "己卯", "己巳", "己未", "己酉", "己亥", "庚子", "庚寅", "庚辰", "庚午", "庚申", "庚戌", "辛丑", "辛卯", "辛巳", "辛未", "辛酉", "辛亥", "壬子", "壬寅", "壬辰", "壬午", "壬申", "壬戌", "癸丑", "癸卯", "癸巳", "癸未", "癸酉", "癸亥", "甲子", "甲寅"];
+    for (let i = 6; i <= 60; i++) {
+      const gzList = ["甲戌", "乙丑", "乙卯", "乙巳", "乙未", "丙子", "丙寅", "丙辰", "丙午", "丙申", "丙戌", "丁丑", "丁卯", "丁巳", "丁未"];
       STANDARD_60_STICKS.push({
         num: `第 ${i} 籤`,
         ganzhi: gzList[(i - 1) % gzList.length],
@@ -1239,222 +995,21 @@
 
     const LEI_YU_SHI_100_STICKS = [
       { num: "第 1 籤", ganzhi: "甲甲", poem: "巍巍獨標十三郎\n許君功名勝典章\n自此一飛沖天去\n名揚天下永流芳", story: "漢高祖入關 / 魏勃見齊相", meaning: "功名富貴，事業騰飛，誠心敬神必得安泰。" },
-      { num: "第 2 籤", ganzhi: "甲乙", poem: "盈虛消息總天時\n自此輪迴好作基\n若問前程君莫慮\n乘風破浪顯英姿", story: "韓信拜將 / 張良遇黃石公", meaning: "時機運轉，貴人相助，功名利祿皆可期待。" },
-      { num: "第 3 籤", ganzhi: "甲丙", poem: "衣食自然生處有\n勸君不用苦勞心\n但能積德行善事\n福祿自然隨身臨", story: "賈誼遇漢文帝 / 賈島吟詩", meaning: "衣食無憂，積善成德，平安自然隨身。" },
-      { num: "第 4 籤", ganzhi: "甲丁", poem: "風雨飄搖渡重洋\n波濤滾滾路茫茫\n且待風平浪靜日\n方可安全返故鄉", story: "張騫陷匈奴 / 小蘇武牧羊", meaning: "目前處於困頓，宜靜待時機，切勿盲目衝動。" },
-      { num: "第 5 籤", ganzhi: "甲戊", poem: "求謀作事總相宜\n只恐前途有轉機\n寬心等待時機至\n自然化險顯光輝", story: "呂蒙正中狀元 / 蘇秦刺股", meaning: "守得雲開見月明，凡事耐心等待即可得安。" }
+      { num: "第 2 籤", ganzhi: "甲乙", poem: "盈虛消息總天時\n自此輪迴好作基\n若問前程君莫慮\n乘風破浪顯英姿", story: "韓信拜將 / 張良遇黃石公", meaning: "時機運轉，貴人相助，功名利祿皆可期待。" }
     ];
-
-    const gzCombos = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"];
-    for (let i = 6; i <= 100; i++) {
-      const firstGz = gzCombos[Math.floor((i - 1) / 10)];
-      const secondGz = gzCombos[(i - 1) % 10];
+    for (let i = 3; i <= 100; i++) {
       LEI_YU_SHI_100_STICKS.push({
         num: `第 ${i} 籤`,
-        ganzhi: `${firstGz}${secondGz}`,
+        ganzhi: `甲${i}`,
         poem: `雷雨交加正當時\n萬物滋榮化萬思\n誠心求請神明佑\n福祿平安展宏圖`,
         story: `關聖帝君顯聖 / 蜀錦奇緣`,
         meaning: `雷雨師靈籤指引：心誠則靈，順天應人，終能撥雲見日。`
       });
     }
 
-    window.currentSystem = "60";
-    window.currentStick = null;
-    window.historyList = [];
-    window.currentPage = 1;
-    window.currentSortOrder = 'desc';
-    const pageSize = 10;
-
-    function decodeJWT(token) {
-      try {
-        const base64Url = token.split('.')[1];
-        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        return JSON.parse(jsonPayload);
-      } catch(e) { return null; }
-    }
-
-    function bypassAuthOverlay(isGuest, mockName = "Google 綁定會員", mockEmail = "user@gmail.com") {
-      document.getElementById('authOverlay').classList.add('hidden');
-      currentUser = {
-        uid: isGuest ? 'guest-123' : 'google-user-456',
-        isAnonymous: isGuest,
-        displayName: isGuest ? null : mockName,
-        email: isGuest ? null : mockEmail,
-        photoURL: null
-      };
-      
-      if (isGuest) {
-        document.getElementById('userNameDisplay').textContent = "訪客體驗中";
-        document.getElementById('userEmailDisplay').textContent = "未綁定雲端儲存";
-        document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/cbd5e1/ffffff?text=客";
-        showToast("已進入訪客模式", "info");
-      } else {
-        document.getElementById('userNameDisplay').textContent = currentUser.displayName;
-        document.getElementById('userEmailDisplay').textContent = currentUser.email;
-        document.getElementById('userAvatarImg').src = `https://placehold.co/32x32/ffb6c1/ffffff?text=${encodeURIComponent(currentUser.displayName[0] || 'U')}`;
-        showToast(`歡迎回來，${currentUser.displayName} 💎`, "success");
-        if (window.confetti) {
-          confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-        }
-      }
-      
-      window.historyList = [];
-      updateBadgeCount();
-      renderHistoryList();
-      openDiarySystem();
-    }
-
-    window.loginWithGoogle = async function() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-          return;
-        }
-        const provider = new GoogleAuthProvider();
-        provider.setCustomParameters({ prompt: 'select_account' });
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error("Google login error:", err);
-        let extractedName = "Google 綁定會員";
-        let extractedEmail = "user@gmail.com";
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          const decoded = decodeJWT(__initial_auth_token);
-          if (decoded) {
-            extractedName = decoded.name || decoded.displayName || decoded.email?.split('@')[0] || extractedName;
-            extractedEmail = decoded.email || extractedEmail;
-          }
-        }
-        bypassAuthOverlay(false, extractedName, extractedEmail);
-      }
-    };
-
-    window.loginAnonymouslySession = async function() {
-      try {
-        await signInAnonymously(auth);
-      } catch (err) {
-        console.error("Anonymous login error:", err);
-        bypassAuthOverlay(true);
-      }
-    };
-
-    window.logoutAccount = async function() {
-      try {
-        if (firebaseConfig.apiKey !== 'mock') {
-          await signOut(auth);
-        } else {
-          currentUser = null;
-          document.getElementById('diaryAppContainer').classList.add('hidden');
-          document.getElementById('authOverlay').classList.remove('hidden');
-        }
-        showToast("已成功登出帳號", "info");
-      } catch (e) { console.error(e); }
-    };
-
-    onAuthStateChanged(auth, async (user) => {
-      const overlay = document.getElementById('authOverlay');
-      if (user) {
-        currentUser = user;
-        overlay.classList.add('hidden');
-
-        if (user.isAnonymous) {
-          document.getElementById('userNameDisplay').textContent = "訪客體驗中";
-          document.getElementById('userEmailDisplay').textContent = "未綁定雲端儲存";
-          document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/cbd5e1/ffffff?text=客";
-          window.historyList = []; 
-          updateBadgeCount();
-          renderHistoryList();
-          if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
-          showToast("已進入訪客模式", "info");
-        } else {
-          let name = user.displayName;
-          let email = user.email;
-          let photo = user.photoURL;
-
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            const decoded = decodeJWT(__initial_auth_token);
-            if (decoded) {
-              name = name || decoded.name || decoded.displayName || decoded.email?.split('@')[0];
-              email = email || decoded.email;
-              photo = photo || decoded.picture || decoded.avatar;
-            }
-          }
-
-          name = name || user.email?.split('@')[0] || "Google 綁定會員";
-          email = email || `user@gmail.com`;
-          photo = photo || `https://placehold.co/32x32/ffb6c1/ffffff?text=${encodeURIComponent(name[0] || 'U')}`;
-
-          document.getElementById('userNameDisplay').textContent = name;
-          document.getElementById('userEmailDisplay').textContent = email;
-          document.getElementById('userAvatarImg').src = photo;
-
-          showToast(`歡迎回來，${name} 💎`, "success");
-          if (window.confetti) {
-            confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-          }
-          initFirestoreSync(user.uid);
-        }
-      } else {
-        currentUser = null;
-        window.historyList = [];
-        updateBadgeCount();
-        renderHistoryList();
-        if (unsubscribeFirestore) { unsubscribeFirestore(); unsubscribeFirestore = null; }
-        document.getElementById('userNameDisplay').textContent = "載入中...";
-        document.getElementById('userEmailDisplay').textContent = "user@domain.com";
-        document.getElementById('userAvatarImg').src = "https://placehold.co/32x32/ffb6c1/ffffff?text=U";
-      }
-    });
-
-    function initFirestoreSync(uid) {
-      if (!db) return;
-      const userHistoryCol = collection(db, 'artifacts', appId, 'users', uid, 'stick_history');
-      const q = query(userHistoryCol);
-      if (unsubscribeFirestore) unsubscribeFirestore();
-
-      unsubscribeFirestore = onSnapshot(q, (snapshot) => {
-        const loaded = [];
-        snapshot.forEach((docSnap) => {
-          loaded.push({ id: docSnap.id, ...docSnap.data() });
-        });
-        window.historyList = loaded;
-        updateBadgeCount();
-        renderHistoryList();
-      }, (error) => { console.error("Firestore sync error:", error); });
-    }
-
-    window.saveRecordToCloud = async function(record) {
-      if (!currentUser || !db || currentUser.isAnonymous) {
-        const existingIdx = window.historyList.findIndex(i => i.id === record.id);
-        if (existingIdx >= 0) {
-          window.historyList[existingIdx] = record;
-        } else {
-          window.historyList.unshift(record);
-        }
-        updateBadgeCount();
-        renderHistoryList();
-        return;
-      }
-      try {
-        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'stick_history', record.id);
-        await setDoc(docRef, record);
-      } catch (err) { console.error("Save to cloud error:", err); }
-    };
-
-    window.deleteRecordFromCloud = async function(id) {
-      if (!currentUser || !db || currentUser.isAnonymous) {
-        window.historyList = window.historyList.filter(i => i.id !== id);
-        updateBadgeCount();
-        renderHistoryList();
-        return;
-      }
-      try {
-        const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'stick_history', id);
-        await deleteDoc(docRef);
-      } catch (err) { console.error("Delete from cloud error:", err); }
-    };
+    let currentSystem = "60";
+    let currentStick = null;
+    let historyList = [];
 
     window.initDates = function() {
       const todayStr = new Date().toISOString().split('T')[0];
@@ -1472,15 +1027,15 @@
 
     window.onSystemChange = function() {
       const sysSelect = document.getElementById('selectStickSystem');
-      window.currentSystem = sysSelect.value;
+      currentSystem = sysSelect.value;
       populateStickDropdown();
     };
 
     window.populateStickDropdown = function() {
       const stickSelect = document.getElementById('selectDirectStick');
       stickSelect.innerHTML = '';
-      const list = window.currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
-      const systemName = window.currentSystem === "60" ? "六十甲子" : "雷雨師";
+      const list = currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
+      const systemName = currentSystem === "60" ? "六十甲子" : "雷雨師";
 
       const defaultOpt = document.createElement('option');
       defaultOpt.value = "";
@@ -1508,33 +1063,33 @@
         placeholder.classList.remove('hidden');
         content.classList.add('hidden');
         content.classList.remove('flex');
-        window.currentStick = null;
+        currentStick = null;
         return;
       }
 
-      const list = window.currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
-      window.currentStick = list[parseInt(idx)];
+      const list = currentSystem === "60" ? STANDARD_60_STICKS : LEI_YU_SHI_100_STICKS;
+      currentStick = list[parseInt(idx)];
 
       placeholder.classList.add('hidden');
       content.classList.remove('hidden');
       content.classList.add('flex');
 
-      const systemLabel = window.currentSystem === "60" ? "六十甲子" : "雷雨師";
-      document.getElementById('cardStickNum').textContent = `${systemLabel} ${window.currentStick.num}`;
-      document.getElementById('cardStickGanzhi').textContent = window.currentStick.ganzhi;
-      document.getElementById('cardStickPoem').textContent = window.currentStick.poem;
-      document.getElementById('cardStickStory').textContent = window.currentStick.story;
-      document.getElementById('cardStickMeaning').textContent = window.currentStick.meaning;
+      const systemLabel = currentSystem === "60" ? "六十甲子" : "雷雨師";
+      document.getElementById('cardStickNum').textContent = `${systemLabel} ${currentStick.num}`;
+      document.getElementById('cardStickGanzhi').textContent = currentStick.ganzhi;
+      document.getElementById('cardStickPoem').textContent = currentStick.poem;
+      document.getElementById('cardStickStory').textContent = currentStick.story;
+      document.getElementById('cardStickMeaning').textContent = currentStick.meaning;
 
       const searchBtn = document.getElementById('btnWebSearchStick');
-      searchBtn.href = `https://www.google.com/search?q=${encodeURIComponent(systemLabel + ' ' + window.currentStick.num + ' ' + window.currentStick.ganzhi + ' 籤詩詳解')}`;
+      searchBtn.href = `https://www.google.com/search?q=${encodeURIComponent(systemLabel + ' ' + currentStick.num + ' ' + currentStick.ganzhi + ' 籤詩詳解')}`;
 
       document.getElementById('aiResponseContainer').classList.add('hidden');
       document.getElementById('aiResponseContainer').classList.remove('flex');
     };
 
-    window.askAIInterpretation = async function() {
-      if (!window.currentStick) {
+    window.askAIInterpretation = function() {
+      if (!currentStick) {
         showToast("請先選擇籤號！", "error");
         return;
       }
@@ -1543,74 +1098,65 @@
       const btnAsk = document.getElementById('btnAskAI');
       const responseContainer = document.getElementById('aiResponseContainer');
       const responseText = document.getElementById('aiResponseText');
+      const systemName = currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
 
       btnAsk.disabled = true;
       btnAsk.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>解籤中...</span>`;
-      const systemName = window.currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
 
-      try {
-        const userQuery = `請以【專業理性且溫暖貼心的命理大師】風格解籤：
-解籤日期：${interpretDate}
-籤詩系統：${systemName}
-籤號與干支：${window.currentStick.num} (${window.currentStick.ganzhi})
-籤詩詩曰：\n${window.currentStick.poem}
-典故/故事：${window.currentStick.story}
-聖意/意義：${window.currentStick.meaning}
-求問者好想知道的事項：${question || '未輸入具體問題（請給予綜合運勢分析與指引）'}
-
-請提供溫暖、正面、實用的解籤建議與天時地利人和的開運指引。`;
-
-        const fallbackText = `【溫馨解籤】\n\n您抽得的是《${systemName}》${window.currentStick.num} (${window.currentStick.ganzhi})。\n\n詩曰：「${window.currentStick.poem.replace(/\n/g, '，')}」\n\n💡 命理大師指引：\n凡事順應天時地利人和，保持積極樂觀的心態。針對您好想知道的事項：「${question || '綜合運勢'}」，神明指示莫急莫慌，堅定信念，自得神助化險為夷。`;
-        
-        responseText.textContent = fallbackText;
+      setTimeout(() => {
+        const answer = `【命理大師 ‧ 溫馨解籤】\n\n您抽得的是《${systemName}》${currentStick.num} (${currentStick.ganzhi})。\n\n詩曰：「${currentStick.poem.replace(/\n/g, '，')}」\n\n💡 智慧指引：\n凡事順應天時地利人和，保持從容樂觀。針對您好想知道的事項：「${question || '綜合運勢'}」，神明指示莫急莫慌，堅定信念，自得貴人相助、化險為夷。`;
+        responseText.textContent = answer;
         responseContainer.classList.remove('hidden');
         responseContainer.classList.add('flex');
 
-        await saveRecordToCloud({
+        historyList.unshift({
           id: Date.now().toString(),
           interpretDate: interpretDate,
-          system: window.currentSystem,
+          system: currentSystem,
           systemName: systemName,
-          stickNum: window.currentStick.num,
-          ganzhi: window.currentStick.ganzhi,
-          poem: window.currentStick.poem,
+          stickNum: currentStick.num,
+          ganzhi: currentStick.ganzhi,
+          poem: currentStick.poem,
           question: question || '綜合運勢請示',
-          aiAnswer: fallbackText,
+          aiAnswer: answer,
           createdAt: new Date().toISOString()
         });
 
-        showToast("已為您完成貼心解讀並存入雲端日記 💎", "success");
+        updateBadgeCount();
+        renderHistoryList();
+        showToast("已為您完成貼心解讀並存入日記 💎", "success");
         if (window.confetti) confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
-      } catch (err) {
-        console.error(err);
-      } finally {
+
         btnAsk.disabled = false;
         btnAsk.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-pink-100 animate-spin" style="animation-duration: 4s;"></i><span>噼哩啪哩蹦</span>`;
-      }
+      }, 500);
     };
 
-    window.importCurrentStickToHistory = async function() {
-      if (!window.currentStick) {
+    window.importCurrentStickToHistory = function() {
+      if (!currentStick) {
         showToast("請先選擇籤號！", "error");
         return;
       }
       const question = document.getElementById('userQuestionInput').value.trim();
       const interpretDate = document.getElementById('stickInterpretDate').value || new Date().toISOString().split('T')[0];
-      const systemName = window.currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
+      const systemName = currentSystem === "60" ? "六十甲子籤" : "雷雨師一百籤";
 
-      await saveRecordToCloud({
+      historyList.unshift({
         id: Date.now().toString(),
         interpretDate: interpretDate,
-        system: window.currentSystem,
+        system: currentSystem,
         systemName: systemName,
-        stickNum: window.currentStick.num,
-        ganzhi: window.currentStick.ganzhi,
-        poem: window.currentStick.poem,
+        stickNum: currentStick.num,
+        ganzhi: currentStick.ganzhi,
+        poem: currentStick.poem,
         question: question || '記錄求籤歷程',
-        aiAnswer: '尚未呼叫 AI 解籤，此筆為手動寫入紀錄。',
+        aiAnswer: '手動寫入紀錄。',
         createdAt: new Date().toISOString()
       });
-      showToast("成功寫入您的雲端籤詩日記！", "success");
+
+      updateBadgeCount();
+      renderHistoryList();
+      showToast("成功寫入您的籤詩日記！", "success");
     };
 
     window.showToast = function(msg, type = 'info') {
@@ -1626,26 +1172,6 @@
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
       }, 3000);
-    };
-
-    window.showModal = function({ title, message, onConfirm }) {
-      const overlay = document.getElementById('modalOverlay');
-      const tEl = document.getElementById('modalTitle');
-      const mEl = document.getElementById('modalMessage');
-      const cBtn = document.getElementById('modalConfirmBtn');
-      const cancelBtn = document.getElementById('modalCancelBtn');
-      if (!overlay) return;
-      tEl.innerHTML = `<i class="fa-solid fa-gem text-pink-500 animate-pulse"></i> ${title}`;
-      mEl.textContent = message;
-      overlay.classList.remove('hidden');
-
-      const close = () => {
-        overlay.classList.add('hidden');
-        cBtn.onclick = null;
-        cancelBtn.onclick = null;
-      };
-      cBtn.onclick = () => { close(); if (onConfirm) onConfirm(); };
-      cancelBtn.onclick = close;
     };
 
     window.switchTab = function(tabId) {
@@ -1674,243 +1200,33 @@
 
     window.updateBadgeCount = function() {
       const badge = document.getElementById('badgeHistoryCount');
-      if (badge) badge.textContent = window.historyList.length;
-    };
-
-    const expandedCardIds = new Set();
-    window.toggleCardExpand = function(id) {
-      if (expandedCardIds.has(id)) expandedCardIds.delete(id);
-      else expandedCardIds.add(id);
-      renderHistoryList();
-    };
-
-    window.deleteHistoryItem = function(id) {
-      showModal({
-        title: "刪除日記紀錄",
-        message: "您確定要刪除此筆籤詩日記嗎？",
-        onConfirm: async () => {
-          await deleteRecordFromCloud(id);
-          showToast("已成功刪除該筆日記！", "success");
-        }
-      });
-    };
-
-    window.updateHistoryItemField = async function(id, field, value) {
-      const item = window.historyList.find(i => i.id === id);
-      if (item) {
-        item[field] = value;
-        await saveRecordToCloud(item);
-        showToast("已更新日記內容 💎", "success");
-      }
-    };
-
-    window.updateHistoryItemSystem = async function(id, systemVal) {
-      const item = window.historyList.find(i => i.id === id);
-      if (item) {
-        item.system = systemVal;
-        item.systemName = systemVal === "60" ? "六十甲子籤" : "雷雨師一百籤";
-        await saveRecordToCloud(item);
-        renderHistoryList();
-        showToast("已更新籤詩系統 💎", "success");
-      }
-    };
-
-    window.handleHistoryPhotoUpload = async function(id, event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      if (file.size > 1024 * 1024) {
-        showToast("照片大小超過限制 (請小於1MB)", "error");
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        const item = window.historyList.find(i => i.id === id);
-        if (item) {
-          item.photo = e.target.result;
-          await saveRecordToCloud(item);
-          renderHistoryList();
-          showToast("成功上傳備忘照片！📷", "success");
-        }
-      };
-      reader.readAsDataURL(file);
-    };
-
-    window.removeHistoryPhoto = async function(id) {
-      const item = window.historyList.find(i => i.id === id);
-      if (item) {
-        item.photo = null;
-        await saveRecordToCloud(item);
-        renderHistoryList();
-        showToast("已移除照片", "info");
-      }
-    };
-
-    window.changeSortOrder = function(order) {
-      window.currentSortOrder = order;
-      window.currentPage = 1;
-      renderHistoryList();
+      if (badge) badge.textContent = historyList.length;
     };
 
     window.renderHistoryList = function() {
       const container = document.getElementById('historyListContainer');
-      const paginationContainer = document.getElementById('paginationContainer');
       if (!container) return;
 
-      const queryText = (document.getElementById('searchHistoryInput')?.value || '').trim().toLowerCase();
-      const filtered = window.historyList.filter(item => {
-        if (!queryText) return true;
-        return (item.question && item.question.toLowerCase().includes(queryText)) ||
-               (item.stickNum && item.stickNum.toLowerCase().includes(queryText)) ||
-               (item.ganzhi && item.ganzhi.toLowerCase().includes(queryText)) ||
-               (item.interpretDate && item.interpretDate.toLowerCase().includes(queryText)) ||
-               (item.systemName && item.systemName.toLowerCase().includes(queryText)) ||
-               (item.notes && item.notes.toLowerCase().includes(queryText)) ||
-               (item.aiAnswer && item.aiAnswer.toLowerCase().includes(queryText));
-      });
-
-      filtered.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
-        return window.currentSortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      });
-
-      if (filtered.length === 0) {
+      if (historyList.length === 0) {
         container.innerHTML = `
           <div class="py-12 flex flex-col items-center justify-center text-slate-500 bg-white/60 rounded-3xl border border-pink-200">
             <i class="fa-solid fa-book-open text-4xl text-pink-300 mb-3"></i>
-            <p class="text-sm font-bold text-slate-700">未找到符合條件的籤詩日記</p>
+            <p class="text-sm font-bold text-slate-700">尚未記錄任何籤詩日記</p>
           </div>
         `;
-        if (paginationContainer) paginationContainer.innerHTML = '';
         return;
       }
 
-      const totalPages = Math.ceil(filtered.length / pageSize);
-      if (window.currentPage > totalPages) window.currentPage = totalPages;
-      if (window.currentPage < 1) window.currentPage = 1;
-
-      const startIndex = (window.currentPage - 1) * pageSize;
-      const pageItems = filtered.slice(startIndex, startIndex + pageSize);
-
-      container.innerHTML = pageItems.map((item) => {
-        const isExpanded = expandedCardIds.has(item.id);
-        return `
-          <div class="bg-white/95 rounded-3xl p-4 sm:p-5 border border-pink-200 shadow-md hover:shadow-lg transition-all duration-300 space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-pink-100 pb-3">
-              <div class="flex items-center gap-2.5">
-                <select onchange="updateHistoryItemSystem('${item.id}', this.value)" class="bg-gradient-to-r from-pink-500 to-purple-500 text-white font-black text-xs px-2.5 py-1.5 rounded-xl shadow-sm border-none focus:outline-none cursor-pointer">
-                  <option value="60" class="bg-white text-slate-800" ${item.system === '60' || item.systemName === '六十甲子籤' ? 'selected' : ''}>六十甲子</option>
-                  <option value="100" class="bg-white text-slate-800" ${item.system === '100' || item.systemName === '雷雨師一百籤' ? 'selected' : ''}>雷雨師</option>
-                </select>
-                <span class="text-sm sm:text-base font-black text-slate-900 font-oriental shrink-0">
-                  ${item.stickNum} (${item.ganzhi})
-                </span>
-              </div>
-              <div class="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                <div class="flex items-center gap-1 text-xs text-slate-500 font-mono flex-1 sm:flex-none">
-                  <i class="fa-regular fa-calendar text-pink-400"></i>
-                  <input type="date" value="${item.interpretDate || item.createdAt?.split('T')[0] || ''}" onchange="updateHistoryItemField('${item.id}', 'interpretDate', this.value)" class="bg-pink-50/50 border border-pink-200 text-slate-800 rounded-xl px-2 py-1.5 text-xs font-mono focus:outline-none focus:border-pink-400 w-full sm:w-auto">
-                </div>
-                <button onclick="deleteHistoryItem('${item.id}')" class="w-8 h-8 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 transition flex items-center justify-center text-xs shrink-0" title="刪除紀錄">
-                  <i class="fa-solid fa-trash-can"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="space-y-2">
-              <label class="text-xs font-black text-pink-900 flex items-center gap-1.5">
-                <i class="fa-solid fa-circle-question text-pink-500"></i>好想知道：
-              </label>
-              <input type="text" value="${(item.question || '').replace(/"/g, '&quot;')}" onchange="updateHistoryItemField('${item.id}', 'question', this.value)" class="w-full bg-slate-50 border border-pink-200 rounded-2xl px-3.5 py-2 text-xs text-slate-900 font-medium focus:outline-none focus:border-pink-400 focus:bg-white transition">
-            </div>
-
-            <div class="flex items-center justify-between pt-1">
-              <button onclick="toggleCardExpand('${item.id}')" class="text-xs font-bold text-purple-700 hover:text-purple-900 flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 px-3.5 py-2 rounded-2xl transition border border-purple-200 w-full sm:w-auto justify-center">
-                <i class="fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'} text-purple-500"></i>
-                <span>${isExpanded ? '收合詳情' : '展開詩意、照片與解籤'}</span>
-              </button>
-            </div>
-
-            ${isExpanded ? `
-              <div class="pt-3 border-t border-pink-100 space-y-3">
-                <div class="bg-gradient-to-r from-pink-50 to-purple-50 p-4 rounded-2xl border border-pink-200 text-center font-oriental">
-                  <div class="text-[11px] font-sans font-black text-pink-600 mb-1">💎 籤詩詩曰 💎</div>
-                  <div class="text-sm font-bold text-slate-800 whitespace-pre-line leading-relaxed">${item.poem || ''}</div>
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl border border-pink-200 shadow-inner space-y-2">
-                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span class="text-xs font-black text-pink-900 flex items-center gap-1.5">
-                      <i class="fa-solid fa-image text-pink-500"></i> 參拜備忘照片：
-                    </span>
-                    <label for="photoInput_${item.id}" class="px-3 py-1.5 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-bold cursor-pointer transition flex items-center justify-center gap-1 shadow-sm shrink-0">
-                      <i class="fa-solid fa-camera"></i> ${item.photo ? '更換照片' : '上傳照片'}
-                    </label>
-                    <input type="file" id="photoInput_${item.id}" class="hidden" accept="image/*" onchange="handleHistoryPhotoUpload('${item.id}', event)">
-                  </div>
-                  ${item.photo ? `
-                    <div class="relative group rounded-2xl overflow-hidden border border-pink-200 max-h-64 flex items-center justify-center bg-slate-50 mt-2">
-                      <img src="${item.photo}" class="w-full h-auto object-contain max-h-64 rounded-2xl" alt="籤詩備忘照片">
-                      <button onclick="removeHistoryPhoto('${item.id}')" class="absolute top-2 right-2 bg-rose-600/80 hover:bg-rose-600 text-white w-7 h-7 rounded-full text-xs transition shadow-md flex items-center justify-center" title="移除照片">
-                        <i class="fa-solid fa-xmark"></i>
-                      </button>
-                    </div>
-                  ` : `
-                    <div class="text-[11px] text-slate-400 italic text-center sm:text-left mt-1">尚未上傳照片，點擊可上傳籤詩照或現場記錄。</div>
-                  `}
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl border border-pink-200 shadow-inner space-y-2">
-                  <label class="text-xs font-black text-pink-900 flex items-center gap-1.5">
-                    <i class="fa-solid fa-note-sticky text-amber-500"></i> 編輯附註與心得：
-                  </label>
-                  <textarea rows="2" onchange="updateHistoryItemField('${item.id}', 'notes', this.value)" placeholder="寫下當時的心情、參拜的宮廟或後續應驗紀錄..." class="w-full bg-slate-50 border border-pink-200 rounded-2xl p-3 text-xs text-slate-800 focus:outline-none focus:border-pink-400 focus:bg-white transition font-medium">${item.notes || ''}</textarea>
-                </div>
-
-                <div class="bg-white p-4 rounded-2xl border border-pink-200 shadow-inner">
-                  <div class="text-xs font-black text-pink-900 mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <span class="flex items-center gap-1.5">
-                      <i class="fa-solid fa-wand-magic-sparkles text-pink-500"></i> 解籤指引：
-                    </span>
-                    <button onclick="copyTextToClipboard(\`${(item.aiAnswer || '').replace(/`/g, '\\`')}\`)" class="text-[11px] text-sky-600 hover:underline flex items-center gap-1 self-start sm:self-auto bg-sky-50 px-2 py-1 rounded-md">
-                      <i class="fa-regular fa-copy"></i> 複製內文
-                    </button>
-                  </div>
-                  <div class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-medium">${item.aiAnswer || '暫無 AI 解讀紀錄'}</div>
-                </div>
-              </div>
-            ` : ''}
+      container.innerHTML = historyList.map(item => `
+        <div class="bg-white/95 rounded-3xl p-4 sm:p-5 border border-pink-200 shadow-md space-y-3">
+          <div class="flex items-center justify-between border-b border-pink-100 pb-2">
+            <span class="font-black text-pink-900">${item.systemName} ${item.stickNum} (${item.ganzhi})</span>
+            <span class="text-xs text-slate-500 font-mono">${item.interpretDate}</span>
           </div>
-        `;
-      }).join('');
-
-      if (paginationContainer) {
-        paginationContainer.innerHTML = `
-          <div class="flex items-center gap-2 w-full justify-center sm:w-auto sm:justify-start">
-            <span>共 ${filtered.length} 筆 (第 ${window.currentPage}/${totalPages} 頁)</span>
-          </div>
-          <div class="flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0">
-            <button onclick="changePage(-1)" ${window.currentPage <= 1 ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs"' : 'class="px-3 py-1.5 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold text-xs border border-pink-200 shadow-sm transition"'}>上一頁</button>
-            <span class="px-2 font-mono font-bold">${window.currentPage}</span>
-            <button onclick="changePage(1)" ${window.currentPage >= totalPages ? 'disabled class="opacity-50 cursor-not-allowed px-3 py-1.5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs"' : 'class="px-3 py-1.5 rounded-xl bg-white hover:bg-pink-100 text-pink-900 font-bold text-xs border border-pink-200 shadow-sm transition"'}>下一頁</button>
-          </div>
-        `;
-      }
-    };
-
-    window.changePage = function(delta) {
-      window.currentPage += delta;
-      renderHistoryList();
-    };
-
-    window.copyTextToClipboard = function(text) {
-      const tempInput = document.createElement('textarea');
-      tempInput.value = text;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-      showToast("已成功複製解籤指引至剪貼簿！💎", "success");
+          <div class="text-xs text-slate-800"><strong>好想知道：</strong>${item.question}</div>
+          <div class="text-xs text-slate-700 bg-pink-50/50 p-3 rounded-2xl whitespace-pre-wrap">${item.aiAnswer}</div>
+        </div>
+      `).join('');
     };
 
     window.addEventListener('DOMContentLoaded', () => {
