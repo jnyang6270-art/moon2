@@ -148,52 +148,38 @@
       position: absolute;
       top: 20%;
       left: 50%;
-      width: 600px;
-      height: 600px;
+      width: 650px;
+      height: 650px;
       transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(74, 129, 146, 0) 70%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.18) 0%, rgba(130, 180, 255, 0.08) 40%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 2;
       animation: pulseGlow 6s ease-in-out infinite alternate;
-      transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     /* Glow flare burst effect when user clicks 你的解籤日記 */
     .ambient-glow.glow-burst {
-      width: 1200px;
-      height: 1200px;
-      background: radial-gradient(circle, rgba(255, 220, 245, 0.75) 0%, rgba(180, 160, 255, 0.45) 40%, rgba(74, 129, 146, 0) 75%);
+      width: 1300px;
+      height: 1300px;
+      background: radial-gradient(circle, rgba(255, 230, 248, 0.85) 0%, rgba(200, 180, 255, 0.55) 35%, rgba(120, 180, 255, 0.2) 60%, transparent 80%);
       opacity: 1 !important;
-      filter: drop-shadow(0 0 80px rgba(255, 182, 230, 0.9));
+      filter: drop-shadow(0 0 90px rgba(255, 182, 230, 0.95));
     }
 
     @keyframes pulseGlow {
-      0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
-      100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
+      0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.6; }
+      100% { transform: translate(-50%, -50%) scale(1.18); opacity: 0.95; }
     }
 
-    /* Meteor Video Container */
-    #meteorVideoOverlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 8;
-      pointer-events: none;
-      opacity: 0;
-      mix-blend-mode: screen;
-      transition: opacity 0.3s ease;
-      object-fit: cover;
-    }
-
-    /* Canvas meteor streak overlay */
+    /* Canvas meteor streak overlay - High z-index to always render on top */
     #meteorCanvas {
-      position: absolute;
+      position: fixed;
       inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 9;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
       pointer-events: none;
     }
 
@@ -208,7 +194,7 @@
       transform-origin: center center;
       z-index: 3;
       opacity: 0;
-      transition: opacity 300ms ease-out, filter 0.6s ease;
+      transition: opacity 300ms ease-out, filter 0.8s ease;
       pointer-events: none;
     }
 
@@ -217,7 +203,7 @@
     }
 
     .stage.moon-glow-active {
-      filter: drop-shadow(0 0 50px rgba(255, 200, 235, 0.95)) drop-shadow(0 0 90px rgba(180, 220, 255, 0.8));
+      filter: drop-shadow(0 0 50px rgba(255, 215, 240, 0.95)) drop-shadow(0 0 90px rgba(180, 220, 255, 0.85));
     }
 
     #cookie-canvas {
@@ -289,6 +275,25 @@
       text-shadow: 0 20px 70px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(0, 0, 0, 0.6);
     }
 
+    /* Constant Radiant Breathing Glow on 你的解籤日記 */
+    @keyframes persistentPortalGlow {
+      0% {
+        filter: drop-shadow(0 0 25px rgba(255, 200, 230, 0.75)) drop-shadow(0 0 50px rgba(180, 210, 255, 0.5));
+        text-shadow: 0 0 20px rgba(255, 230, 245, 0.85), 0 10px 40px rgba(0, 0, 0, 0.9);
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        filter: drop-shadow(0 0 40px rgba(255, 220, 240, 1)) drop-shadow(0 0 75px rgba(190, 225, 255, 0.85)) drop-shadow(0 0 110px rgba(255, 182, 215, 0.6));
+        text-shadow: 0 0 32px rgba(255, 255, 255, 1), 0 0 60px rgba(255, 192, 230, 0.9), 0 15px 50px rgba(0, 0, 0, 0.95);
+        transform: translateX(-50%) scale(1.025);
+      }
+      100% {
+        filter: drop-shadow(0 0 25px rgba(255, 200, 230, 0.75)) drop-shadow(0 0 50px rgba(180, 210, 255, 0.5));
+        text-shadow: 0 0 20px rgba(255, 230, 245, 0.85), 0 10px 40px rgba(0, 0, 0, 0.9);
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
     .diff-title {
       top: 1020px;
       left: 50%;
@@ -305,20 +310,24 @@
       z-index: 5;
       pointer-events: auto;
       cursor: pointer;
-      text-shadow: 0 20px 70px rgba(0, 0, 0, 0.95), 0 4px 20px rgba(0, 0, 0, 0.7);
-      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease, color 0.4s ease;
+      color: #ffffff;
+      animation: persistentPortalGlow 3.6s ease-in-out infinite;
+      transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.4s ease;
     }
 
     .diff-title:hover {
-      filter: drop-shadow(0 0 35px rgba(255, 210, 230, 0.95)) drop-shadow(0 0 60px rgba(180, 220, 255, 0.7));
-      transform: translateX(-50%) scale(1.04);
-      color: #fff9fc;
+      animation: none !important;
+      filter: drop-shadow(0 0 50px rgba(255, 230, 245, 1)) drop-shadow(0 0 85px rgba(190, 225, 255, 0.95)) drop-shadow(0 0 130px rgba(255, 182, 215, 0.8)) !important;
+      text-shadow: 0 0 35px rgba(255, 255, 255, 1), 0 0 70px rgba(255, 192, 230, 1) !important;
+      transform: translateX(-50%) scale(1.05) !important;
     }
 
     .diff-title.title-glow-active {
+      animation: none !important;
       color: #ffffff;
-      filter: drop-shadow(0 0 45px rgba(255, 230, 245, 1)) drop-shadow(0 0 90px rgba(160, 200, 255, 1)) !important;
-      transform: translateX(-50%) scale(1.07) !important;
+      filter: drop-shadow(0 0 60px rgba(255, 245, 255, 1)) drop-shadow(0 0 110px rgba(200, 235, 255, 1)) drop-shadow(0 0 160px rgba(255, 192, 230, 1)) !important;
+      text-shadow: 0 0 45px rgba(255, 255, 255, 1), 0 0 90px rgba(255, 200, 240, 1) !important;
+      transform: translateX(-50%) scale(1.08) !important;
     }
 
     .split-char {
@@ -398,6 +407,9 @@
   </style>
 </head>
 <body onclick="createClickEffects(event)">
+
+  <!-- Fixed Meteor Streak Canvas (Z-Index 999 above 3D Moon & Background) -->
+  <canvas id="meteorCanvas"></canvas>
 
   <!-- ================= AUTH LOGIN OVERLAY ================= -->
   <div id="authOverlay" class="fixed inset-0 z-[10000] bg-pink-950/75 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-opacity duration-500">
@@ -662,14 +674,6 @@
         <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
         <div class="scene-vignette"></div>
         <div class="ambient-glow" id="ambientGlow"></div>
-        
-        <!-- Video meteor stream from reference -->
-        <video id="meteorVideoOverlay" playsinline muted preload="auto">
-          <source src="https://www.image2url.com/r2/default/videos/1787220187246-c607a138-af17-4611-8152-a54bbe7dad0d.mp4" type="video/mp4">
-        </video>
-
-        <!-- Canvas for dynamic shooting star particles -->
-        <canvas id="meteorCanvas"></canvas>
       </div>
 
       <!-- 2. Header UI (Clean - no right button) -->
@@ -685,7 +689,7 @@
         <!-- Hero Title -->
         <h1 class="title-container hero-title" id="hero-title">三分</h1>
 
-        <!-- Section 2 Title: Exclusive Gateway -->
+        <!-- Section 2 Title: Exclusive Glowing Gateway -->
         <h2 class="title-container diff-title" id="diff-title" onclick="triggerMeteorAndEnterDiary(event)" title="點擊進入籤詩日記系統">你的解籤日記</h2>
       </div>
     </div>
@@ -695,7 +699,7 @@
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    // Global Interactive Functions
+    // Global Interactive Click Effects
     window.createClickEffects = function(e) {
       if (e.type === 'touchstart') return;
       const bubble = document.createElement('div');
@@ -708,22 +712,23 @@
       setTimeout(() => bubble.remove(), 600);
     };
 
-    // Meteor Canvas Animation Engine
+    // Dynamic Meteor Shower Simulation Engine
     const meteorCanvas = document.getElementById('meteorCanvas');
     const mCtx = meteorCanvas.getContext('2d');
     let mWidth = window.innerWidth;
     let mHeight = window.innerHeight;
-    meteorCanvas.width = mWidth;
-    meteorCanvas.height = mHeight;
 
-    window.addEventListener('resize', () => {
+    function resizeMeteorCanvas() {
       mWidth = window.innerWidth;
       mHeight = window.innerHeight;
       meteorCanvas.width = mWidth;
       meteorCanvas.height = mHeight;
-    });
+    }
+    resizeMeteorCanvas();
+    window.addEventListener('resize', resizeMeteorCanvas);
 
     let activeMeteors = [];
+    let activeSparkles = [];
     let isMeteorAnimating = false;
 
     class Meteor {
@@ -736,52 +741,81 @@
         this.thickness = thickness;
         this.color = color || '#ffffff';
         this.opacity = 1;
-        this.decay = 0.018;
+        this.decay = 0.016;
       }
       update() {
         this.x += Math.cos(this.angle) * this.speed;
         this.y += Math.sin(this.angle) * this.speed;
         this.opacity -= this.decay;
+
+        // Leave tiny glowing stardust sparkles
+        if (Math.random() < 0.35 && this.opacity > 0.2) {
+          activeSparkles.push({
+            x: this.x + (Math.random() - 0.5) * 12,
+            y: this.y + (Math.random() - 0.5) * 12,
+            radius: Math.random() * 2.5 + 1,
+            opacity: this.opacity * 0.8,
+            decay: 0.03
+          });
+        }
       }
       draw(ctx) {
         if (this.opacity <= 0) return;
         ctx.save();
-        ctx.strokeStyle = this.color;
-        ctx.lineWidth = this.thickness;
         ctx.lineCap = 'round';
         ctx.globalAlpha = Math.max(0, this.opacity);
-        ctx.shadowBlur = 18;
-        ctx.shadowColor = '#ffd1dc';
+        ctx.shadowBlur = 24;
+        ctx.shadowColor = '#ffd6e8';
 
         const tailX = this.x - Math.cos(this.angle) * this.length;
         const tailY = this.y - Math.sin(this.angle) * this.length;
 
         const grad = ctx.createLinearGradient(tailX, tailY, this.x, this.y);
         grad.addColorStop(0, 'rgba(255, 255, 255, 0)');
-        grad.addColorStop(0.6, 'rgba(255, 210, 240, 0.7)');
+        grad.addColorStop(0.5, 'rgba(255, 192, 230, 0.65)');
+        grad.addColorStop(0.85, 'rgba(255, 235, 245, 0.95)');
         grad.addColorStop(1, 'rgba(255, 255, 255, 1)');
 
         ctx.strokeStyle = grad;
+        ctx.lineWidth = this.thickness;
         ctx.beginPath();
         ctx.moveTo(tailX, tailY);
         ctx.lineTo(this.x, this.y);
         ctx.stroke();
+
+        // Glowing Star Head
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.thickness * 1.3, 0, Math.PI * 2);
+        ctx.fill();
+
         ctx.restore();
       }
     }
 
     function launchMeteorShower() {
-      // Spawn meteors curving and flashing across the moon from top-right to bottom-left
-      for (let i = 0; i < 6; i++) {
+      // Spawn 12 radiant meteors flashing gracefully across and around the 3D moon
+      for (let i = 0; i < 14; i++) {
         setTimeout(() => {
-          const startX = mWidth * 0.7 + (Math.random() - 0.5) * 200;
-          const startY = mHeight * 0.15 + (Math.random() - 0.5) * 150;
-          const angle = Math.PI * 0.78 + (Math.random() - 0.5) * 0.15;
-          const speed = 28 + Math.random() * 16;
-          const length = 240 + Math.random() * 180;
-          const thickness = 2.5 + Math.random() * 2.5;
-          activeMeteors.push(new Meteor(startX, startY, speed, angle, length, thickness, '#ffd1dc'));
-        }, i * 90);
+          const originCorner = Math.random() < 0.65 ? 'topRight' : 'topCenter';
+          let startX, startY, angle;
+
+          if (originCorner === 'topRight') {
+            startX = mWidth * 0.75 + (Math.random() - 0.5) * (mWidth * 0.4);
+            startY = (Math.random() - 0.2) * (mHeight * 0.35);
+            angle = Math.PI * 0.72 + (Math.random() - 0.5) * 0.18;
+          } else {
+            startX = mWidth * 0.45 + (Math.random() - 0.5) * (mWidth * 0.3);
+            startY = -40;
+            angle = Math.PI * 0.65 + (Math.random() - 0.5) * 0.15;
+          }
+
+          const speed = 32 + Math.random() * 20;
+          const length = 260 + Math.random() * 240;
+          const thickness = 2.8 + Math.random() * 2.8;
+
+          activeMeteors.push(new Meteor(startX, startY, speed, angle, length, thickness, '#ffd6e8'));
+        }, i * 65);
       }
 
       if (!isMeteorAnimating) {
@@ -792,12 +826,30 @@
 
     function animateMeteors() {
       mCtx.clearRect(0, 0, mWidth, mHeight);
+
+      // 1. Draw Sparkles
+      activeSparkles = activeSparkles.filter(s => s.opacity > 0);
+      for (let s of activeSparkles) {
+        s.opacity -= s.decay;
+        mCtx.save();
+        mCtx.globalAlpha = Math.max(0, s.opacity);
+        mCtx.fillStyle = '#ffffff';
+        mCtx.shadowBlur = 10;
+        mCtx.shadowColor = '#ffd1dc';
+        mCtx.beginPath();
+        mCtx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        mCtx.fill();
+        mCtx.restore();
+      }
+
+      // 2. Draw Meteors
       activeMeteors = activeMeteors.filter(m => m.opacity > 0);
       for (let m of activeMeteors) {
         m.update();
         m.draw(mCtx);
       }
-      if (activeMeteors.length > 0) {
+
+      if (activeMeteors.length > 0 || activeSparkles.length > 0) {
         requestAnimationFrame(animateMeteors);
       } else {
         isMeteorAnimating = false;
@@ -812,7 +864,6 @@
       const diffTitle = document.getElementById('diff-title');
       const stage = document.getElementById('stage');
       const ambientGlow = document.getElementById('ambientGlow');
-      const meteorVideo = document.getElementById('meteorVideoOverlay');
 
       // 1. Text & Moon Glow Flare
       diffTitle.classList.add('title-glow-active');
@@ -838,27 +889,20 @@
         }
       } catch (e) {}
 
-      // 3. Canvas Meteor Flash
+      // 3. Launch Dynamic Pink & White Meteor Shower
       launchMeteorShower();
 
-      // 4. Try video overlay playback if available
-      if (meteorVideo) {
-        meteorVideo.style.opacity = '0.9';
-        meteorVideo.currentTime = 0;
-        meteorVideo.play().catch(() => {});
-      }
-
-      // 5. Confetti sparkle burst around text
+      // 4. Confetti Sparkle Burst
       if (window.confetti) {
         confetti({
-          particleCount: 45,
-          spread: 75,
+          particleCount: 50,
+          spread: 80,
           origin: { y: 0.85 },
           colors: ['#ffd1dc', '#ffb7c5', '#e6e6fa', '#ffffff']
         });
       }
 
-      // 6. Seamlessly open login overlay after meteor flash
+      // 5. Seamlessly open login overlay after meteor flash
       setTimeout(() => {
         const authOverlay = document.getElementById('authOverlay');
         authOverlay.classList.remove('hidden');
@@ -872,12 +916,8 @@
           diffTitle.classList.remove('title-glow-active');
           stage.classList.remove('moon-glow-active');
           ambientGlow.classList.remove('glow-burst');
-          if (meteorVideo) {
-            meteorVideo.style.opacity = '0';
-            meteorVideo.pause();
-          }
         }, 600);
-      }, 700);
+      }, 750);
     };
 
     window.openDiarySystem = function() {
@@ -1203,7 +1243,7 @@
         span.style.opacity = opacity;
       });
 
-      // 3D Moon Motion
+      // 3D Moon Smooth Motion: Maintain 1:1 natural scale
       const cookieIntro = easeOutBack(clamp((introProgress - 0.22) / 0.72));
       const targetHeroX = 0;
       const targetHeroY = layoutState.heroY;
@@ -1213,8 +1253,8 @@
       let finalCookieY = lerp(curHeroY, layoutState.sectionY, transition) + Math.sin(transition * Math.PI) * 9 + idleFloat;
       let finalCookieX = curHeroX + Math.sin(transition * Math.PI) * -20 + smoothMouseX * 18;
 
-      const curHeroScale = lerp(0.18, layoutState.heroScale, cookieIntro);
-      const finalCookieScale = lerp(curHeroScale, layoutState.sectionScale * 0.96, transition);
+      // Keep scale perfectly natural (1.0x) throughout the entire experience
+      const finalCookieScale = lerp(0.95, 1.0, cookieIntro);
 
       cookieGroup.position.set(finalCookieX, finalCookieY, 0);
       cookieGroup.scale.set(finalCookieScale, finalCookieScale, finalCookieScale);
