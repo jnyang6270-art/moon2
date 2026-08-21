@@ -1000,28 +1000,7 @@
       sceneNavEl.classList.add('is-ready');
     }
 
-    function createProceduralMoonFallback() {
-      if (moonModel) return;
-      const geom = new THREE.SphereGeometry(266, 64, 64);
-      const mat = new THREE.MeshStandardMaterial({
-        color: 0xe0e5ec,
-        roughness: 0.7,
-        metalness: 0.05
-      });
-      const sphere = new THREE.Mesh(geom, mat);
-      sphere.castShadow = true;
-      sphere.receiveShadow = true;
-      innerGroup.add(sphere);
-      moonModel = sphere;
-      dismissLoadingHud();
-    }
-
     function applyGltfModel(gltf) {
-      if (moonModel) {
-        while (innerGroup.children.length > 0) {
-          innerGroup.remove(innerGroup.children[0]);
-        }
-      }
       const model = gltf.scene;
       moonModel = model;
 
@@ -1057,18 +1036,13 @@
       dismissLoadingHud();
     }
 
-    // Safety timeout: Never hang on spinning loader for more than 1.8s
-    setTimeout(() => {
-      if (!isLoaded) {
-        createProceduralMoonFallback();
-      }
-    }, 1800);
-
-    // Primary: Load from CDN directly to support file:// protocol perfectly
-    const modelUrl = 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb';
+    // Load the real 3D Moon model
+    const isLocalFile = window.location.protocol === 'file:';
+    const primaryUrl = isLocalFile ? 'Hi3D-moon.glb' : 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb';
+    const fallbackUrl = isLocalFile ? 'https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/Hi3D-moon.glb' : 'Hi3D-moon.glb';
 
     loader.load(
-      modelUrl,
+      primaryUrl,
       applyGltfModel,
       function (xhr) {
         if (xhr.lengthComputable && xhr.total > 0) {
@@ -1078,13 +1052,20 @@
         }
       },
       function (err) {
-        console.warn('CDN model load failed, trying local fallback...', err);
+        console.warn('Primary 3D moon load failed, trying fallback...', err);
         loader.load(
-          'Hi3D-moon.glb',
+          fallbackUrl,
           applyGltfModel,
-          null,
-          function () {
-            createProceduralMoonFallback();
+          function (xhr) {
+            if (xhr.lengthComputable && xhr.total > 0) {
+              const pct = Math.round((xhr.loaded / xhr.total) * 100);
+              const statusEl = document.getElementById('load-status');
+              if (statusEl) statusEl.textContent = `正在載入 3D 月球 (${pct}%)...`;
+            }
+          },
+          function (fallbackErr) {
+            console.error('All 3D Moon loading attempts failed:', fallbackErr);
+            dismissLoadingHud();
           }
         );
       }
