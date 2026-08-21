@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="h-full bg-slate-950 text-slate-100">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -16,10 +16,10 @@
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts for Chinese Display Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Serif+TC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
 
   <!-- Three.js + GLTFLoader (Modern ES Modules & Import Map for r160) -->
   <script type="importmap">
@@ -38,10 +38,20 @@
       font-weight: 500;
       font-display: swap;
     }
+    @font-face {
+      font-family: 'Suisse Fallback';
+      src: local('Inter SemiBold'), local('Inter-SemiBold');
+      font-weight: 600;
+      font-display: swap;
+    }
 
     :root {
       --desktop-scale: 1;
       --header-scale: 1;
+      --brand-edge-margin: 45px;
+      --social-edge-margin: 38.6204px;
+      --design-width: 1726;
+      --design-height: 1195;
       --tablet-layout: 0;
       --mobile-layout: 0;
       --hero-background-crop: 0.115;
@@ -54,108 +64,165 @@
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
     }
 
     html, body {
       width: 100%;
-      min-height: 100%;
-      background-color: var(--sky-blue);
+      min-height: 320vh;
+      background: #0d172e;
       color: #ffffff;
-      font-family: 'M PLUS Rounded 1c', 'Noto Serif TC', serif;
+      font-family: 'Suisse Fallback', 'Inter', Arial, sans-serif;
       overflow-x: hidden;
+      overscroll-behavior: none;
+      scrollbar-width: none;
+    }
+
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
     }
 
     .experience {
       position: relative;
       width: 100%;
       height: 320vh;
-      background: #02040a;
+      pointer-events: none;
     }
 
+    /* Fixed Viewport Container */
     .viewport {
-      position: sticky;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       overflow: hidden;
+      pointer-events: auto;
     }
 
+    /* Background Scene */
     .scene {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
       z-index: 1;
-      pointer-events: none;
+      overflow: hidden;
     }
 
-    .landscape {
+    .scene .landscape {
       position: absolute;
-      left: 50%;
       top: 0;
-      width: auto;
-      height: 100%;
-      min-width: 100vw;
+      left: 50%;
+      width: 105vw;
+      height: auto;
+      min-height: 140vh;
+      transform: translate3d(-50%, 0, 0);
       object-fit: cover;
-      transform: translate3d(-50%, calc(var(--hero-background-crop) * -100%), 0);
       will-change: transform;
-      filter: saturate(1.15) contrast(1.08) brightness(1.02);
+      pointer-events: none;
+      transition: filter 0.5s ease;
+    }
+
+    @media (max-width: 1060px) and (max-aspect-ratio: 49/64) {
+      .scene .landscape {
+        height: 145dvh;
+        width: auto;
+        min-width: 105vw;
+        object-fit: cover;
+      }
     }
 
     .scene-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 4, 10, 0.4) 100%);
-      pointer-events: none;
-    }
-
-    .ambient-glow {
-      position: absolute;
-      top: 25%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 85vw;
-      height: 85vh;
-      max-width: 1100px;
-      max-height: 1100px;
-      background: radial-gradient(circle, rgba(230, 240, 255, 0.14) 0%, rgba(120, 180, 255, 0.05) 45%, transparent 75%);
+      background: linear-gradient(180deg, rgba(6, 40, 52, 0.035), transparent 32%, rgba(18, 25, 9, 0.025));
       pointer-events: none;
       z-index: 2;
     }
 
-    .scene-nav {
+    /* Ambient dynamic glow overlay */
+    .ambient-glow {
       position: absolute;
+      top: 20%;
+      left: 50%;
+      width: 600px;
+      height: 600px;
+      transform: translate(-50%, -50%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, rgba(74, 129, 146, 0) 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      animation: pulseGlow 6s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.9; }
+    }
+
+    /* Stage Canvas System (1726 x 1195) */
+    .stage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 1726px;
+      height: 1195px;
+      transform: translate(-50%, -50%) scale(var(--desktop-scale));
+      transform-origin: center center;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 300ms ease-out;
+      pointer-events: none;
+    }
+
+    .stage.is-ready {
+      opacity: 1;
+    }
+
+    #cookie-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: auto;
+      cursor: pointer;
+    }
+
+    /* Header Nav */
+    .scene-nav {
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      height: 110px;
-      z-index: 20;
-      pointer-events: none;
+      height: 0;
+      z-index: 10;
       opacity: 0;
-      transform: translateY(-24px);
-      transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: opacity 300ms ease-out;
+      pointer-events: auto;
     }
 
     .scene-nav.is-ready {
       opacity: 1;
-      transform: translateY(0);
     }
 
     .brand-text {
       position: absolute;
-      top: 38px;
-      left: 48px;
-      font-family: 'Noto Serif TC', 'Songti TC', serif;
-      font-size: 16px;
+      top: 38.6204px;
+      left: var(--brand-edge-margin);
+      color: #ffffff;
+      font-family: 'Noto Serif TC', serif;
       font-weight: 700;
+      font-size: 16px;
       letter-spacing: 0.35em;
-      color: rgba(255, 255, 255, 0.88);
-      pointer-events: auto;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85);
-      user-select: none;
+      text-transform: uppercase;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+      transform-origin: left top;
+      transform: scale(var(--header-scale));
     }
 
     .nav-enter-btn {
@@ -190,34 +257,7 @@
       border-color: rgba(255, 255, 255, 0.7);
     }
 
-    .stage {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 1726px;
-      height: 1195px;
-      transform: translate(-50%, -50%) scale(var(--desktop-scale));
-      transform-origin: center center;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.8s ease-out;
-    }
-
-    .stage.is-ready {
-      opacity: 1;
-    }
-
-    #cookie-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 3;
-      pointer-events: auto;
-      cursor: pointer;
-    }
-
+    /* Titles */
     .title-container {
       position: absolute;
       display: flex;
@@ -226,7 +266,6 @@
       color: #ffffff;
       white-space: nowrap;
       pointer-events: none;
-      user-select: none;
     }
 
     .hero-title {
@@ -235,7 +274,7 @@
       transform: translateX(-50%);
       width: 1480px;
       height: 320px;
-      font-family: 'Noto Serif TC', 'Songti TC', 'STSong', serif;
+      font-family: 'Noto Serif TC', 'Songti TC', serif;
       font-weight: 900;
       font-size: 260px;
       line-height: 0.9;
@@ -252,7 +291,7 @@
       transform: translateX(-50%);
       width: 900px;
       height: 140px;
-      font-family: 'Noto Serif TC', 'Songti TC', 'STSong', serif;
+      font-family: 'Noto Serif TC', 'Songti TC', serif;
       font-weight: 900;
       font-size: 118px;
       line-height: 0.95;
@@ -278,7 +317,7 @@
       transition: color 0.3s ease;
     }
 
-    /* Bubble Glass UI */
+    /* Bubble Glass Card UI for Diary Overlay */
     .bubble-glass {
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(20px);
@@ -305,43 +344,10 @@
       box-shadow: 0 0 10px rgba(255,255,255,0.8), inset 0 0 5px rgba(255,255,255,0.9);
       pointer-events: none;
       animation: popBubble 0.6s ease-out forwards;
-      z-index: 9999;
+      z-index: 99999;
     }
 
-    /* Loading Hud */
-    .loading-hud {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: #02040a;
-      z-index: 1000;
-      transition: opacity 0.6s ease;
-    }
-
-    .loading-spinner {
-      width: 52px;
-      height: 52px;
-      border: 3px solid rgba(255, 255, 255, 0.15);
-      border-top-color: #ffd1dc;
-      border-radius: 50%;
-      animation: spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-      margin-bottom: 20px;
-    }
-
-    .loading-text {
-      font-family: 'Noto Serif TC', serif;
-      font-size: 14px;
-      letter-spacing: 0.25em;
-      color: rgba(255, 255, 255, 0.75);
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
+    /* Responsive */
     @media (max-width: 1060px) {
       :root { --tablet-layout: 1; }
       .hero-title {
@@ -363,12 +369,6 @@
         font-size: 13px;
         letter-spacing: 0.25em;
       }
-      .nav-enter-btn {
-        top: 18px;
-        right: 18px;
-        padding: 8px 16px;
-        font-size: 12px;
-      }
       .hero-title {
         left: 50% !important;
         transform: translateX(-50%);
@@ -386,33 +386,10 @@
     }
   </style>
 </head>
-<body class="selection:bg-pink-300 selection:text-pink-900" onclick="createClickEffects(event)">
-
-  <!-- Loading HUD -->
-  <div class="loading-hud" id="loading-hud">
-    <div class="loading-spinner"></div>
-    <div class="loading-text" id="load-status">正在載入 3D 月相...</div>
-  </div>
-
-  <!-- Toast Notification Container -->
-  <div id="toastContainer" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none w-full max-w-xs sm:max-w-sm px-4 sm:px-0"></div>
-
-  <!-- Confirmation Modal -->
-  <div id="modalOverlay" class="fixed inset-0 bg-pink-950/50 backdrop-blur-md z-[9990] hidden flex items-center justify-center p-4">
-    <div class="bubble-glass rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-      <h3 id="modalTitle" class="text-lg font-black text-pink-700 font-oriental flex items-center gap-2">
-        <i class="fa-solid fa-gem text-pink-500 animate-pulse"></i> 確認操作
-      </h3>
-      <p id="modalMessage" class="text-sm text-slate-700 leading-relaxed font-medium">您確定要執行此操作嗎？</p>
-      <div class="flex items-center justify-end gap-3 pt-2">
-        <button id="modalCancelBtn" class="px-5 py-2.5 rounded-2xl bg-white/90 hover:bg-white text-slate-700 text-xs font-bold transition border border-pink-200 shadow-sm">取消</button>
-        <button id="modalConfirmBtn" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-400 via-purple-400 to-sky-400 hover:opacity-90 text-white text-xs font-black shadow-md shadow-pink-300 transition">確定執行</button>
-      </div>
-    </div>
-  </div>
+<body onclick="createClickEffects(event)">
 
   <!-- ================= AUTH LOGIN OVERLAY ================= -->
-  <div id="authOverlay" class="fixed inset-0 z-[9900] bg-pink-950/75 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-opacity duration-500">
+  <div id="authOverlay" class="fixed inset-0 z-[10000] bg-pink-950/75 backdrop-blur-xl hidden flex items-center justify-center p-4 transition-opacity duration-500">
     <div class="bubble-glass rounded-[3rem] max-w-md w-full p-8 shadow-2xl flex flex-col items-center text-center space-y-6 relative overflow-hidden border border-white/80">
       <div class="absolute -top-24 -right-24 w-48 h-48 bg-gradient-to-br from-pink-300/50 to-purple-300/50 rounded-full blur-2xl pointer-events-none"></div>
       
@@ -456,32 +433,11 @@
     </div>
   </div>
 
-  <!-- ================= 3D MOON BACKGROUND SCENE ================= -->
-  <main class="experience" id="moonExperience">
-    <div class="viewport">
-      <div class="scene">
-        <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
-        <div class="scene-vignette"></div>
-        <div class="ambient-glow"></div>
-      </div>
-
-      <nav class="scene-nav" id="scene-nav">
-        <div class="brand-text">天時。地利。人和</div>
-        <button onclick="openDiarySystem()" class="nav-enter-btn" title="開啟籤詩日記系統">
-          <span>進入籤詩日記 ➔</span>
-        </button>
-      </nav>
-
-      <div class="stage" id="stage">
-        <canvas id="cookie-canvas"></canvas>
-        <h1 class="title-container hero-title" id="hero-title">三分</h1>
-        <h2 class="title-container diff-title" id="diff-title" title="點擊開啟籤詩日記">你的解籤日記</h2>
-      </div>
-    </div>
-  </main>
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[99999] flex flex-col gap-2 pointer-events-none w-full max-w-xs sm:max-w-sm px-4 sm:px-0"></div>
 
   <!-- ================= DIARY DASHBOARD OVERLAY ================= -->
-  <div id="diaryAppContainer" class="fixed inset-0 z-[8000] hidden overflow-y-auto bg-gradient-to-br from-pink-950/85 via-purple-950/85 to-slate-950/90 backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between">
+  <div id="diaryAppContainer" class="fixed inset-0 z-[9000] hidden overflow-y-auto bg-gradient-to-br from-pink-950/85 via-purple-950/85 to-slate-950/90 backdrop-blur-2xl transition-all duration-500 flex flex-col justify-between">
     
     <header class="bubble-glass sticky top-0 z-40 px-4 py-3 shadow-md">
       <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
@@ -687,11 +643,43 @@
     </footer>
   </div>
 
+  <!-- Scroll container of 320vh for original smooth parallax -->
+  <main class="experience">
+    <div class="viewport">
+      <!-- 1. Background scene & parallax -->
+      <div class="scene">
+        <img class="landscape" id="landscape-img" src="https://cdn.jsdelivr.net/gh/jnyang6270-art/moon@main/background.jpg" alt="Starry Sky Sea Landscape">
+        <div class="scene-vignette"></div>
+        <div class="ambient-glow"></div>
+      </div>
+
+      <!-- 2. Header UI -->
+      <nav class="scene-nav" id="scene-nav">
+        <div class="brand-text">天時。地利。人和</div>
+        <button onclick="openDiarySystem()" class="nav-enter-btn" title="開啟籤詩日記系統">
+          <span>進入籤詩日記 ➔</span>
+        </button>
+      </nav>
+
+      <!-- 3. Stage Container (1726 x 1195) -->
+      <div class="stage" id="stage">
+        <!-- Three.js Canvas -->
+        <canvas id="cookie-canvas"></canvas>
+
+        <!-- Hero Title -->
+        <h1 class="title-container hero-title" id="hero-title">三分</h1>
+
+        <!-- Section 2 Title -->
+        <h2 class="title-container diff-title" id="diff-title" title="點擊開啟籤詩日記">你的解籤日記</h2>
+      </div>
+    </div>
+  </main>
+
   <script type="module">
     import * as THREE from 'three';
     import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-    // Sound & Click Bubble
+    // Global Interactive Functions
     window.createClickEffects = function(e) {
       if (e.type === 'touchstart') return;
       const bubble = document.createElement('div');
@@ -779,7 +767,6 @@
     const sceneNavEl = document.getElementById('scene-nav');
     const landscapeImg = document.getElementById('landscape-img');
     const canvas = document.getElementById('cookie-canvas');
-    const loadingHud = document.getElementById('loading-hud');
 
     let layoutState = {
       w: window.innerWidth,
@@ -844,17 +831,16 @@
     updateLayout();
     window.addEventListener('resize', updateLayout);
 
-    // Three.js Render Scene with EXACT original lighting
+    // Three.js Render Scene with EXACT original lighting & materials
     const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1726 / 2, 1726 / 2, 1195 / 2, -1195 / 2, -2000, 2000);
-    camera.position.z = 1000;
+    const camera = new THREE.OrthographicCamera(-863, 863, 597.5, -597.5, 0.1, 4000);
+    camera.position.z = 2000;
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
-    renderer.setSize(1726, 1195);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.setSize(1726, 1195, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.setClearColor(0x000000, 0);
 
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0x704019, 0.9);
     scene.add(hemiLight);
@@ -876,8 +862,19 @@
     cookieGroup.add(innerGroup);
     scene.add(cookieGroup);
 
+    // Floating loading indicator
+    const loadingHud = document.createElement('div');
+    loadingHud.id = 'loading-hud';
+    loadingHud.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:999;color:#fff;font-family:sans-serif;font-size:14px;background:rgba(0,0,0,0.7);padding:14px 28px;border-radius:24px;backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:12px;pointer-events:none;transition:opacity 0.4s ease;';
+    loadingHud.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" stroke="#ffffff" stroke-width="2.5" fill="none" style="animation:spinLoader 1s linear infinite"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg><span id="load-status">正在載入 3D 月相...</span>';
+    document.body.appendChild(loadingHud);
+
+    const spinStyle = document.createElement('style');
+    spinStyle.textContent = '@keyframes spinLoader { 100% { transform: rotate(360deg); } }';
+    document.head.appendChild(spinStyle);
+
     let moonModel = null;
-    let introStartTime = 0;
+    let introStartTime = performance.now() + 100;
     const loader = new GLTFLoader();
 
     function applyGltfModel(gltf) {
@@ -911,10 +908,8 @@
       innerGroup.scale.set(baseScale, baseScale, baseScale);
       innerGroup.add(model);
 
-      if (loadingHud) {
-        loadingHud.style.opacity = '0';
-        setTimeout(() => loadingHud.remove(), 400);
-      }
+      loadingHud.style.opacity = '0';
+      setTimeout(() => loadingHud.remove(), 400);
       introStartTime = performance.now();
       stageEl.classList.add('is-ready');
       sceneNavEl.classList.add('is-ready');
@@ -967,12 +962,14 @@
 
       const introProgress = introStartTime > 0 ? clamp((now - introStartTime) / 1600) : 0;
 
+      // Parallax Background exact formula
       const bgCrop = lerp(0.115, 0.303, smoothScroll);
       landscapeImg.style.transform = `translate3d(-50%, calc(${bgCrop} * -100%), 0) scale(${1 + smoothScroll * 0.05})`;
 
       const transition = clamp((smoothScroll - 0.12) / 0.56);
       const idleFloat = Math.sin(now * 0.0018) * 8;
 
+      // Hero Title Animation
       const nHero = heroSpans.length;
       heroSpans.forEach((span, i) => {
         const dir = i < nHero / 2 ? -1 : 1;
@@ -999,6 +996,7 @@
         span.style.opacity = opacity;
       });
 
+      // Diff Title Animation (firmly grounded at bottom)
       const nDiff = diffSpans.length;
       diffSpans.forEach((span, i) => {
         const enterP = easeOutBack(clamp((smoothScroll - 0.27 - i * 0.006) / 0.22));
@@ -1012,6 +1010,7 @@
         span.style.opacity = opacity;
       });
 
+      // 3D Moon Motion
       const cookieIntro = easeOutBack(clamp((introProgress - 0.22) / 0.72));
       const targetHeroX = 0;
       const targetHeroY = layoutState.heroY;
